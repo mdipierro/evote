@@ -1,0 +1,21 @@
+{{extend 'layout.html'}}
+
+<p>
+  Tokens are issued to voters when the election starts. During a vote vote the token is transfered to the ballot. The total set of tokens below should not change unless the election has been tampered with by an administrator and a new ballot has been fabricated.
+</p>
+
+<h2>Token Used ({{=len(tokens_used)}})</h2>
+
+<ul>
+  {{for token in tokens_used:}}
+  <li>{{=token.token}}</li>
+  {{pass}}
+</ul>
+
+<h2>Token Unused ({{=len(tokens_unused)}})</h2>
+
+<ul>
+  {{for token in tokens_unused:}}
+  <li>{{=token.token}}</li>
+  {{pass}}
+</ul>

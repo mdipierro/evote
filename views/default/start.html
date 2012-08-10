@@ -1,0 +1,17 @@
+{{extend 'layout.html'}}
+
+
+{{=form}}
+
+{{if failures:}}
+<h2>We failed email the following voters:</h2>
+<ul>
+  {{for failure in failures:}}
+  <li style="color:red">{{=failure}}</li>
+  {{pass}}
+</ul>
+{{pass}}
+
+<h2>Example ballot</h2>
+{{=demo}}
+

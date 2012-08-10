@@ -1,0 +1,19 @@
+{{extend 'layout.html'}}
+
+<h2>Results</h2>
+
+{{=form}}
+
+{{if receipts:}}
+<h2>Individual Receipts ({{=len(receipts)}})</h2>
+
+<p>Each receipt point to a copy of a ballot which has been counted.</p>
+
+<ul>
+  {{for receipt in receipts:}}
+  <li>
+    {{=A(receipt.signature,_href=URL('receipt',args=receipt.signature))}}
+  </li>
+  {{pass}}
+</ul>
+{{pass}}

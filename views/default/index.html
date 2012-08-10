@@ -1,0 +1,8 @@
+{{extend 'layout.html'}}
+
+<center>
+<img src="{{=URL('static','images/vote.png')}}" />
+<h2>Secure - Trusted - Verifiable</h2>
+</center>
+
+This is an electornic system for online verifiable voting. You can login and create a ballot using a wiki like syntax. Then you add a list of voters. We email the voters a unique link to vote. We count the votes and issue results. Upon voting each voter is issued a receipt by email. The receipt contains an anonymized copy of the ballot. The anonymized copies of the ballots are also published. This allows each used to check that their vote has been counted. The ballots are digitally signed to make sure they have not been tampered with. When the election starts each voter is issued a token. All tokens are published. When voter casts his vote the token is transferred to the ballot. This ensure that no additional ballot are forged, that each ballot is unique, and that voters cannot make false claims by forging signatures for invalid ballots. As votes are casted you, the administrator of the election, are also emailed copied of the anonimized ballots by email.
