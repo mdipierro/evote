@@ -8,7 +8,6 @@ def index():
 @auth.requires_login()
 def elections():
     POLICY = {'election':True, 'voter':False}
-    db.election.secret.default = 'secret-'+uuid()
     db.election.title.default = 'Election title (edit this)'
     db.election.ballot.default = SAMPLE
     db.election.voters.default = auth.user.email
