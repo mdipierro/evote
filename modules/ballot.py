@@ -1,33 +1,29 @@
 from gluon import *
 import re, hashlib
 from uuid import uuid4
-regex = re.compile('\((\d+)\!?\)')
+regex = re.compile('{{(\w+)\!?}}')
 regex_email = re.compile('[\w_\-\.]+\@[\w_\-\.]+')
 
 SAMPLE = """
-## Election Title
+<h2>Election Title</h2>
 
-This is a ballot!
+<p>This is a ballot!</p>
 
-Text can be **bold** or ''italic'' and contain links and tables:
+<table>
+<tr><td>Candidate 1</td><td>{{0}}</td></tr>
+<tr><td>Candidate 2</td><td>{{0}}</td></tr>
+<tr><td>Candidate 3</td><td>{{0}}</td></tr>
+</table>
 
--------
-Candidate 1 | (0)
-Candidate 2 | (0)
-Candidate 3 | (0)
--------
-(exclusive)
+<p>or</p>
 
-or 
+<table>
+<tr><td>Candidate 1</td><td>{{1}} yes</td><td>{{1}}</td><td>{{1!}} abstain</td></tr>
+<tr><td>Candidate 2</td><td>{{2}} yes</td><td>{{2}}</td><td>{{2!}} abstain</td></tr>
+<tr><td>Candidate 3</td><td>{{3}} yes</td><td>{{3}}</td><td>{{3!}} abstain</td></tr>
+</table>
 
--------
-Candidate 1 | (1) yes | (1) no | (1!) abstain
-Candidate 2 | (2) yes | (2) no | (2!) abstain
-Candidate 3 | (3) yes | (3) no | (3!) abstain
--------
-(not exclusive)
-
-The ! identifies a default option between a set of exclusive choices.
+<p>The ! identifies a default option between a set of exclusive choices.</p>
 """
 
 
@@ -38,37 +34,35 @@ def sign(text,secret):
     return text+'-'+hashlib.sha1(text+secret).hexdigest()
 
 def ballot2form(ballot,readonly=False,counters=None,filled=False):
-    """ if counters is passed this counts the results in the ballot """
-    
+    """ if counters is passed this counts the results in the ballot """    
     radioes = {}    
     if isinstance(counters,dict): readonly=True
     def radio(item):        
-        k = int(item.group(1))        
-        value = radioes[k] = radioes.get(k,0)+1        
+        name = "ck_"+item.group(1)       
+        value = radioes[name] = radioes.get(name,0)+1        
         if isinstance(counters,dict):
-            return INPUT(_type='text',_readonly=True,_value=counters.get((k,value),0),_style="width:3em").xml()
+            return INPUT(_type='text',_readonly=True,
+                         _value=counters.get((name,value),0),
+                         _style="width:3em").xml()
         if not counters is None and 'x' in item.group().lower():
-            counters[k,value] = counters.get((k,value),0)+1            
-        return INPUT(_type='radio',_name='ck%s'%k,_value=value,
-                     _checked=('!' in item.group() or \
-                                   'x' in item.group().lower()),
+            counters[name,value] = counters.get((name,value),0)+1            
+        return INPUT(_type='radio',_name=name,_value=value,
+                     _checked=('!' in item.group()),
                      _disabled=readonly).xml()    
-    body = regex.sub(radio,MARKMIN(ballot).xml())
+    body = regex.sub(radio,ballot)
     form = FORM(XML(body),not readonly and INPUT(_type='submit') or '')
-    if not readonly: form.process()
+    if not readonly: form.process(formname="ballot")
     return form
 
-def form2ballot(ballot,token=None,vars=None,counters=None,results=None):    
-    k, radioes = 0, {}
+def form2ballot(ballot,token,vars,results):    
+    radioes = {}
     def check(item):
-        k = int(item.group(1))
-        value = radioes[k] = radioes.get(k,0)+1
-        if counters:
-            return '[%s]' % counters.get((k,value),0)
-        else:
-            x = vars.get('ck%s'%k,0)==str(value)
-            if isinstance(results,dict): results[(k,value)] = 1 if x else 0
-            return '[X]' if x else '[ ]'
+        name = 'ck_'+item.group(1)
+        value = radioes[name] = radioes.get(name,0)+1
+        checked = vars.get(name,0)==str(value)
+        if isinstance(results,dict): results[(name,value)] = checked
+        return INPUT(_type="radio",_name=name,_value=value,
+                     _disabled=True,_checked=checked).xml()
     filled_ballot = regex.sub(check,ballot)
-    if token: filled_ballot += '\n\n[%s]' % token
-    return filled_ballot
+    if token: filled_ballot += '<hr/><tt>%s</tt><hr/>' % token
+    return '<div class="ballot">%s</div>' % filled_ballot.strip()

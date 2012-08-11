@@ -4,9 +4,7 @@
 
 <h3>Signature: {{=receipt.signature}}</h3>
 
-<pre>
-  {{=receipt.ballot}}
-</pre>
+{{=XML(receipt.ballot)}}
 
 <p>
   The signature is comprised of two parts. The first part is the SHA1 of the submitted ballot. This can be verified independelty by each voter thus proving the ballot has not been altered. The second part is the SHA1(first_part+secret) where secret is an election dependent secret salt to prevent forgery of signatures by voters and false claims of voter fraud.

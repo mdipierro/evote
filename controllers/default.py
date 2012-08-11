@@ -15,6 +15,9 @@ def elections():
     db.election.secret.default = 'secret-'+uuid()
     grid = SQLFORM.smartgrid(
         db.election,
+        fields = {'election':[db.election.title],
+                  'voter':[db.voter.email,db.voter.invited_on,
+                           db.voter.voted_on]},
         constraints = {'election':db.election.created_by==auth.user.id},
         linked_tables = ['voter'],
         details=False, create = POLICY, editable = POLICY, deletable = POLICY,
@@ -67,7 +70,7 @@ def receipt():
 def start():
     election = db.election(request.args(0,cast=int)) or redirect('index')
     response.subtitle = election.title
-    demo = ballot2form(election.ballot,readonly=True)
+    demo = ballot2form(election.ballot)
     form = FORM(INPUT(_type='submit',_value='Email voters to start election'))
     failures = []
     if form.process().accepted:
@@ -89,7 +92,7 @@ def start():
                 failures.append(email)
         if not failures:
             session.flash = 'Emails sent successfully'
-            redirect(URL('index'))
+            redirect(URL('elections'))
     return dict(demo=demo,form=form,failures=failures)
 
 def invalid_link():
@@ -104,7 +107,7 @@ def vote():
     voter = db.voter(uuid=voter_uuid)
     if not voter:
         redirect(URL('invalid_link'))
-    if not debug_mode and voter.voted_on!=None:
+    if not debug_mode and voter.token==None:
         redirect(URL('voted_already'))
     election = db.election(voter.election)    
     if election.deadline and request.now>election.deadline:
@@ -115,7 +118,7 @@ def vote():
     signature = None
     if form.accepted:
         results = {}
-        ballot = form2ballot(election.ballot,voter.token,
+        ballot = form2ballot(election.ballot,token=voter.token,
                              vars=request.vars,results=results)
         signature = 'receipt-'+\
             sign(hashlib.sha1(ballot).hexdigest(),election.secret)
