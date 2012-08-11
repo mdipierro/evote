@@ -9,7 +9,7 @@ response.files.append(URL('static','cleditor/jquery.cleditor.table.min.js'))
 
 <h3>Info</h3>
 
-<b>ballot</b> is the text of the ballot. {{0}} {{1}} {{2}} ..., add INPUT radio boxes. Radio boxes with the same number are exclusive. <b>votes</b> is a list of emails (one per line) who will be asked to vote using the ballot. <b>emails</b> is a list of emails (one per line) who will be notified when a new vote is recorded. Voting is anonymous and verifiable. Results become public when the election is closed.
+<b>ballot</b> is the text of the ballot. {&#8203;{0}&#8203;} {&#8203;{1}&#8203;} {&#8203;{2}&#8203;} ..., add INPUT radio boxes. Radio boxes with the same number are exclusive. <b>votes</b> is a list of emails (one per line) who will be asked to vote using the ballot. <b>emails</b> is a list of emails (one per line) who will be notified when a new vote is recorded. Voting is anonymous and verifiable. Results become public when the election is closed.
 {{if '/'.join(request.args[:2]) in ('election/edit','election/new'):}}{{pass}}
 
 {{=grid}}
