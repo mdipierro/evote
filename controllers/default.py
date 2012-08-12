@@ -119,7 +119,7 @@ def vote():
         message = VOTED_MESSAGE % dict(            
             title=election.title,
             receipt=URL('receipt',args=receipt_uuid,scheme='http'))
-        attachment = mail.Attachment(filename=receipt_uuid+'.ballot',
+        attachment = mail.Attachment(filename=receipt_uuid+'.html',
                                      payload=cStringIO.StringIO(ballot))
         for email in regex_email.findall(election.managers):
             mail.send(to=email,
