@@ -1,8 +1,15 @@
 from gluon import *
 import re, hashlib
 from uuid import uuid4
+try:
+    import ast
+    have_ast=True
+except:
+    have_ast=False
+
 regex = re.compile('{{(\w+)\!?}}')
 regex_email = re.compile('[\w_\-\.]+\@[\w_\-\.]+')
+
 
 SAMPLE = """
 <h2>Election Title</h2>
@@ -33,6 +40,9 @@ def uuid():
 def sign(text,secret):
     return text+'-'+hashlib.sha1(text+secret).hexdigest()
 
+def unpack_results(results):
+    return ast.literal_eval(results) if have_ast else eval(results)
+
 def ballot2form(ballot,readonly=False,counters=None,filled=False):
     """ if counters is passed this counts the results in the ballot """    
     radioes = {}    
@@ -50,7 +60,7 @@ def ballot2form(ballot,readonly=False,counters=None,filled=False):
                      _checked=('!' in item.group()),
                      _disabled=readonly).xml()    
     body = regex.sub(radio,ballot)
-    form = FORM(XML(body),not readonly and INPUT(_type='submit') or '')
+    form = FORM(XML(body),not readonly and INPUT(_type='submit', _value="Vote!") or '',_class="ballot")
     if not readonly: form.process(formname="ballot")
     return form
 
@@ -64,5 +74,5 @@ def form2ballot(ballot,token,vars,results):
         return INPUT(_type="radio",_name=name,_value=value,
                      _disabled=True,_checked=checked).xml()
     filled_ballot = regex.sub(check,ballot)
-    if token: filled_ballot += '<hr/><tt>%s</tt><hr/>' % token
+    if token: filled_ballot += '<hr/><pre>\n%s\n</pre><hr/>' % token
     return '<div class="ballot">%s</div>' % filled_ballot.strip()

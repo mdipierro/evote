@@ -66,9 +66,12 @@
        uncomment to load jquery-ui //-->
   <noscript><link href="{{=URL('static', 'css/bootswatch_nojs.css')}}" rel="stylesheet" type="text/css" /></noscript>
   {{block head}}{{end}}
+  <style>
+    .ballot { border: 5px solid black; margin: 10px 0; padding: 20px;}
+  </style>
 </head>
 
-<body>
+<body>  
   <!-- Navbar ================================================== -->
   <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
@@ -79,6 +82,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </a>
+	<a class="brand" href="{{=URL('index',scheme=True)}}">E-Vote</a>
 	<div id="navbar">{{='auth' in globals() and auth.navbar() or ''}}</div>
 	<div class="nav-collapse">
 	  {{is_mobile=request.user_agent().is_mobile}}
@@ -96,10 +100,11 @@
     <!-- Masthead ================================================== -->
     <header class="mastheader" id="header">
       <div class="page-header">
-	<h1>
-	  {{=response.title or request.application}}
-	  <small>{{=response.subtitle or ''}}</small>
-	</h1>
+	{{if response.subtitle:}}
+	<h2>
+	  {{=response.subtitle or ''}}
+	</h2>
+	{{pass}}
       </div>
     </header>
     

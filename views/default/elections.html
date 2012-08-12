@@ -1,23 +1,19 @@
-{{
-response.files.append(URL('static','cleditor/jquery.cleditor.css'))
-response.files.append(URL('static','cleditor/jquery.cleditor.min.js'))
-response.files.append(URL('static','cleditor/jquery.cleditor.table.min.js'))
-}}
 {{extend 'layout.html'}}
 
-<h2>Management Interface</h2>
-
-<h3>Info</h3>
-
-<b>ballot</b> is the text of the ballot. {&#8203;{0}&#8203;} {&#8203;{1}&#8203;} {&#8203;{2}&#8203;} ..., add INPUT radio boxes. Radio boxes with the same number are exclusive. <b>votes</b> is a list of emails (one per line) who will be asked to vote using the ballot. <b>emails</b> is a list of emails (one per line) who will be notified when a new vote is recorded. Voting is anonymous and verifiable. Results become public when the election is closed.
-{{if '/'.join(request.args[:2]) in ('election/edit','election/new'):}}{{pass}}
-
-{{=grid}}
-
-<script type="text/javascript">
-jQuery(function() {
-  jQuery("#election_ballot").cleditor({width: '100%'})[0].focus();
-  jQuery("#election_voters").css({width:'300px'});
-  jQuery("#election_emails").css({width:'300px'});
-});
-</script>
+<table>
+  <tr>
+    <td>{{=A('Create New',_href=URL('edit'),_class="btn")}}</td>
+    <td></td>
+  </tr>
+  {{for row in elections:}}
+  <tr style="vertical-align:middle">
+    <td style="vertical-align:middle"><b>{{=row.title}}</b></td>
+    <td>
+      {{=A('Start',_href=URL('start',args=row.id),_class="btn")}}
+      {{=A('Tokens',_href=URL('tokens',args=row.id),_class="btn")}}
+      {{=A('Results',_href=URL('results',args=row.id),_class="btn")}}
+      {{=A('Edit',_href=URL('edit',args=row.id),_class="btn")}}
+    </td>    
+  </tr>
+  {{pass}}
+</table>

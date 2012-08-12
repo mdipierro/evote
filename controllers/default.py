@@ -1,93 +1,54 @@
-debug_mode = False
+debug_mode = True
 
-from ballot import ballot2form, form2ballot, sign, uuid, regex_email, SAMPLE
+from ballot import ballot2form, form2ballot, sign, \
+    uuid, regex_email, SAMPLE, unpack_results
 
 def index():
     return dict()
 
 @auth.requires_login()
 def elections():
-    POLICY = {'election':True, 'voter':False}
+    response.subtitle = 'My Elections'
+    elections = db(db.election.created_by==auth.user.id).select(
+        orderby=~db.election.created_on)
+    return dict(elections=elections)
+
+@auth.requires_login()
+def edit():
+    response.subtitle = "Edit Ballot"
     db.election.title.default = 'Election title (edit this)'
     db.election.ballot.default = SAMPLE
     db.election.voters.default = auth.user.email
-    db.election.emails.default = auth.user.email
+    db.election.managers.default = auth.user.email
     db.election.secret.default = 'secret-'+uuid()
-    grid = SQLFORM.smartgrid(
-        db.election,
-        fields = {'election':[db.election.title],
-                  'voter':[db.voter.email,db.voter.invited_on,
-                           db.voter.voted_on]},
-        constraints = {'election':db.election.created_by==auth.user.id},
-        linked_tables = ['voter'],
-        details=False, create = POLICY, editable = POLICY, deletable = POLICY,
-        links = {'election': [
-                lambda row:A('View',_href=URL('start',args=row.id)),
-                lambda row:A('Tokens',_href=URL('tokens',args=row.id)),
-                lambda row:A('Results',_href=URL('results',args=row.id))]})
-    return dict(grid=grid)
+    election = db.election(request.args(0,cast=int,default=0))
+    if election and not election.created_by==auth.user_id:
+        redirect(URL('not_authorized'))
+    form = SQLFORM(db.election,election).process()
+    if form.accepted: redirect(URL('start',args=form.vars.id))
+    return dict(form=form)
 
-def results():
-    try:
-        import ast
-        have_ast=True
-    except:
-        have_ast=False
-    id = request.args(0,cast=int) or redirect(URL('index'))
-    election = db.election(id) or redirect(URL('index'))
-    if auth.user_id!=election.created_by and not(election.deadline \
-            and request.now>election.deadline):
-        session.flash = 'Results not yet available'
-        redirect(URL('index'))
-    receipts = db(db.receipt.election==election.id).select()
-    response.subtitle = election.title
-    counters = {}
-    for receipt in receipts:
-        results = ast.literal_eval(receipt.results) if have_ast else eval(receipt.results)
-        for key in results:
-            counters[key] = counters.get(key,0) + results[key]
-    form = ballot2form(election.ballot,counters=counters)
-    return dict(form=form,receipts=receipts)
-
-def tokens():
-    id = request.args(0,cast=int) or redirect(URL('index'))
-    election = db.election(id) or redirect(URL('index'))
-    response.subtitle = election.title
-    tokens_unused = db(db.voter.election==election.id)(db.voter.token!=None)\
-        .select(db.voter.token,orderby=db.voter.token)
-    tokens_used = db(db.receipt.election==election.id)(db.receipt.token!=None)\
-        .select(db.receipt.token,orderby=db.receipt.token)
-    return dict(tokens_used=tokens_used, tokens_unused=tokens_unused,
-                election=election)
-
-def receipt():
-    receipt = db.receipt(signature=request.args(0)) \
-        or redirect(URL('invalid_link'))
-    election = db.election(receipt.election)
-    response.subtitle = election.title
-    return dict(receipt=receipt)
-
-def start():
+def start():    
     election = db.election(request.args(0,cast=int)) or redirect('index')
-    response.subtitle = election.title
+    response.subtitle = election.title+' / Start'
     demo = ballot2form(election.ballot)
     form = FORM(INPUT(_type='submit',_value='Email voters to start election'))
     failures = []
     if form.process().accepted:
         for email in regex_email.findall(election.voters):
-            voter = db(db.voter.election==election.id)\
+            voter = db(db.voter.election_id==election.id)\
                 (db.voter.email==email).select().first()
-            voter_uuid = voter.uuid if voter else 'voter-'+uuid()
-            token_uuid = voter.token if voter else \
-                'token-'+sign(uuid(),election.secret)
+            voter_uuid = voter.voter_uuid if voter else 'voter-'+uuid()
             message = VOTE_MESSAGE % dict(
                 title = election.title,
                 link = URL('vote',args=voter_uuid,scheme='https'))
             if mail.send(to=email,subject=election.title,message=message):
                 if not voter:
-                    db.voter.insert(election=election.id,
-                                    uuid=voter_uuid,token=token_uuid,
-                                        email=email,invited_on=request.now)
+                    db.voter.insert(election_id=election.id,
+                                    voter_uuid=voter_uuid,voted=False,
+                                    email=email,invited_on=request.now)
+                    token_uuid = 'token-'+sign(uuid(),election.secret)
+                    db.token.insert(election_id=election.id,token_uuid=token_uuid)
             else:
                 failures.append(email)
         if not failures:
@@ -95,43 +56,72 @@ def start():
             redirect(URL('elections'))
     return dict(demo=demo,form=form,failures=failures)
 
-def invalid_link():
-    return dict(message='Invalid Link')
+def results():
+    id = request.args(0,cast=int) or redirect(URL('index'))
+    election = db.election(id) or redirect(URL('index'))
+    if auth.user_id!=election.created_by and not(election.deadline \
+            and request.now>election.deadline):
+        session.flash = 'Results not yet available'
+        redirect(URL('index'))
+    receipts = db(db.receipt.election_id==election.id).select()
+    response.subtitle = election.title + ' / Results'
+    counters = {}
+    for receipt in receipts:
+        results = unpack_results(receipt.results)
+        for key in results:
+            counters[key] = counters.get(key,0) + results[key]
+    form = ballot2form(election.ballot,counters=counters)
+    return dict(form=form,receipts=receipts,election=election)
 
-def voted_already():
-    return dict(message='You already voted')
+def tokens():
+    election = db.election(request.args(0,cast=int)) or \
+        redirect(URL('invalid_link'))
+    response.subtitle = election.title + ' / Tokens'
+    tokens = db(db.token.election_id==election.id).select(
+        orderby=db.token.token_uuid)
+    return dict(tokens=tokens,election=election)
+
+def receipt():
+    receipt = db.receipt(receipt_uuid=request.args(0)) \
+        or redirect(URL('invalid_link'))
+    election = db.election(receipt.election_id)
+    response.subtitle = election.title + ' / Receipt'
+    return dict(receipt=receipt)
+
 
 def vote():    
     import pickle, hashlib, cStringIO
-    voter_uuid = request.args(0) or redirect('index')
-    voter = db.voter(uuid=voter_uuid)
+    voter_uuid = request.args(1) or redirect('index')
+    voter = db.voter(voter_uuid=voter_uuid)
     if not voter:
         redirect(URL('invalid_link'))
-    if not debug_mode and voter.token==None:
+    if not debug_mode and voter.voted:
         redirect(URL('voted_already'))
-    election = db.election(voter.election)    
+    election = db.election(voter.election_id)    
     if election.deadline and request.now>election.deadline:
         session.flash = 'Election is closed'
         redirect(URL('results',args=election.id))
-    response.subtitle = election.title
+    response.subtitle = election.title + ' / Vote'
     form = ballot2form(election.ballot,readonly=False)
-    signature = None
     if form.accepted:
         results = {}
-        ballot = form2ballot(election.ballot,token=voter.token,
+        token = db(db.token.receipt_uuid==None).select(orderby='<random>',
+                                                       limitby=(0,1)).first()
+        if not token: redirect(URL('no_more_tokens'))
+        ballot = form2ballot(election.ballot,token=token.token_uuid,
                              vars=request.vars,results=results)
-        signature = 'receipt-'+\
+        receipt_uuid = 'receipt-'+\
             sign(hashlib.sha1(ballot).hexdigest(),election.secret)
-        db.receipt.insert(election=election.id,results=str(results),
-                          ballot=ballot,signature=signature,
-                          token=voter.token)
-        voter.update_record(voted_on=request.now,token=None)
+        db.receipt.insert(election_id=election.id,results=str(results),
+                          filled_ballot=ballot,receipt_uuid=receipt_uuid)
+        token.update_record(receipt_uuid=receipt_uuid, voted_on=request.now)
+        voter.update_record(voted=True)
         message = VOTED_MESSAGE % dict(            
             title=election.title,
-            receipt=URL('receipt',args=signature,scheme='http'))
-        attachment = mail.Attachment(filename=signature+'.ballot',
+            receipt=URL('receipt',args=receipt_uuid,scheme='http'))
+        attachment = mail.Attachment(filename=receipt_uuid+'.ballot',
                                      payload=cStringIO.StringIO(ballot))
-        for email in regex_email.findall(election.emails):
+        for email in regex_email.findall(election.managers):
             mail.send(to=email,
                       subject='Copy of Receipt for %s' % election.title,
                       message=message,attachments=[attachment])
@@ -141,8 +131,20 @@ def vote():
             session.flash = 'Your vote was recored and we sent you an email'
         else:
             session.flash = 'Your vote was recored but we failed to email you'
-        redirect(URL('receipt',args=signature))
-    return dict(form=form,signature=signature)
+        redirect(URL('receipt',args=receipt_uuid))
+    return dict(form=form)
 
 def user():
     return dict(form=auth())
+
+def invalid_link():
+    return dict(message='Invalid Link')
+
+def voted_already():
+    return dict(message='You already voted')
+
+def not_authorized():
+    return dict(message='Not Authorized')
+
+def no_more_tokens():
+    return dict(message='No More Tokens / Vote Not recorded')

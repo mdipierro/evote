@@ -1,19 +1,9 @@
 {{extend 'layout.html'}}
 
-<h2>Results</h2>
-
 {{=form}}
 
-{{if receipts:}}
-<h2>Individual Receipts ({{=len(receipts)}})</h2>
+<p>Election is completed re-counted every time this page is visited. You can see the invidivual ballots which have been counted and their associated tokens here</p>
 
-<p>Each receipt point to a copy of a ballot which has been counted.</p>
+{{=A('Tokens and Ballots',_href=URL('tokens',args=election.id),_class="btn")}}
 
-<ul>
-  {{for receipt in receipts:}}
-  <li>
-    {{=A(receipt.signature,_href=URL('receipt',args=receipt.signature))}}
-  </li>
-  {{pass}}
-</ul>
-{{pass}}
+

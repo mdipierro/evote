@@ -1,21 +1,33 @@
 {{extend 'layout.html'}}
 
+<table>
+  <tr>
+    <th>Total tokens/Total voters:</th><td>{{=len(tokens)}}</td>
+  </tr>
+  <tr>
+    <th>Used tokens/Total votes:</th><td>{{=len([t for t in tokens if t.receipt_uuid])}}</td>
+  </tr>
+</table>
+
 <p>
   Tokens are issued to voters when the election starts. During a vote vote the token is transfered to the ballot. The total set of tokens below should not change unless the election has been tampered with by an administrator and a new ballot has been fabricated.
 </p>
 
-<h2>Token Used ({{=len(tokens_used)}})</h2>
-
-<ul>
-  {{for token in tokens_used:}}
-  <li>{{=token.token}}</li>
+<table>
+  <tr>
+    <th>Token Code</th>
+    <th>Associated Receipt (if token used)</th>
+  </tr>
+  {{for token in tokens:}}
+  <tr>
+    <td>
+      {{=token.token_uuid}}
+    </td>
+    <td>
+      {{if token.receipt_uuid:}}
+      {{=A(token.voted_on,_href=URL('receipt',args=token.receipt_uuid))}}
+      {{pass}}
+    </td>
+  </tr>
   {{pass}}
-</ul>
-
-<h2>Token Unused ({{=len(tokens_unused)}})</h2>
-
-<ul>
-  {{for token in tokens_unused:}}
-  <li>{{=token.token}}</li>
-  {{pass}}
-</ul>
+</table>

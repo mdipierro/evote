@@ -1,13 +1,15 @@
 {{extend 'layout.html'}}
 
-<h2>Submitted ballot</h2>
+{{=XML(receipt.filled_ballot)}}
 
-<h3>Signature: {{=receipt.signature}}</h3>
-
-{{=XML(receipt.ballot)}}
+<pre>
+Signature: {{=receipt.receipt_uuid}}
+</pre>
 
 <p>
-  The signature is comprised of two parts. The first part is the SHA1 of the submitted ballot. This can be verified independelty by each voter thus proving the ballot has not been altered. The second part is the SHA1(first_part+secret) where secret is an election dependent secret salt to prevent forgery of signatures by voters and false claims of voter fraud.
+  The signature is comprised of two parts. The first part ({{=receipt.receipt_uuid.split('-')[1]}}) is the SHA1 of the submitted ballot. This can be verified independelty by each voter thus proving the ballot has not been altered. The second part ({{=receipt.receipt_uuid.split('-')[2]}}) is the SHA1(first_part+secret) where secret is an election dependent secret salt to prevent forgery of signatures by voters and false claims of voter fraud. The token embedded in the filled ballot is one of the token published at the start of election. It guanartees that administrators have not forged this ballot.
 </p>
 
+{{=A('Election Results',_href=URL('results',args=receipt.election_id),_class="btn")}}
+{{=A('Tokens and Ballots',_href=URL('tokens',args=receipt.election_id),_class="btn")}}
 
