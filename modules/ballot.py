@@ -29,8 +29,6 @@ SAMPLE = """
 <tr><td>Candidate 2</td><td>{{2}} yes</td><td>{{2}}</td><td>{{2!}} abstain</td></tr>
 <tr><td>Candidate 3</td><td>{{3}} yes</td><td>{{3}}</td><td>{{3!}} abstain</td></tr>
 </table>
-
-<p>The ! identifies a default option between a set of exclusive choices.</p>
 """
 
 

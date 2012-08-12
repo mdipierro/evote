@@ -91,7 +91,7 @@ def receipt():
 
 def vote():    
     import pickle, hashlib, cStringIO
-    voter_uuid = request.args(1) or redirect('index')
+    voter_uuid = request.args(0) or redirect('index')
     voter = db.voter(voter_uuid=voter_uuid)
     if not voter:
         redirect(URL('invalid_link'))
