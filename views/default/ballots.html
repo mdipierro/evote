@@ -2,10 +2,10 @@
 
 <table>
   <tr>
-    <th>Total tokens/Total voters:</th><td>{{=len(tokens)}}</td>
+    <th>Total Ballots/Voters</th><td>{{=len(ballots)}}</td>
   </tr>
   <tr>
-    <th>Used tokens/Total votes:</th><td>{{=len([t for t in tokens if t.receipt_uuid])}}</td>
+    <th>Used Ballots/Votes:</th><td>{{=len([t for t in ballots if not t.voted_on is None])}}</td>
   </tr>
 </table>
 
@@ -15,18 +15,16 @@
 
 <table>
   <tr>
-    <th>Token Code</th>
-    <th>Associated Receipt (if token used)</th>
+    <th>Ballot Id</th>
+    <th>Voted On</th>
   </tr>
-  {{for token in tokens:}}
+  {{for ballot in ballots:}}
   <tr>
     <td>
-      {{=token.token_uuid}}
+      {{=A(ballot.ballot_uuid,_href=URL('receipt',args=ballot.receipt_uuid))}}
     </td>
     <td>
-      {{if token.receipt_uuid:}}
-      {{=A(token.voted_on,_href=URL('receipt',args=token.receipt_uuid))}}
-      {{pass}}
+      {{=ballot.voted_on or 'BLANK'}}
     </td>
   </tr>
   {{pass}}

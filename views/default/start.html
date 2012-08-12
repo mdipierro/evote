@@ -1,6 +1,7 @@
 {{extend 'layout.html'}}
 
 {{=form}}
+{{=A('Back to Edit',_href=URL('edit',args=election.id),_class="btn")}}
 
 {{if failures:}}
 <h2>We failed email the following voters:</h2>

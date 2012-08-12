@@ -1,7 +1,7 @@
 debug_mode = False
 
-from ballot import ballot2form, form2ballot, sign, \
-    uuid, regex_email, SAMPLE, unpack_results
+from ballot import ballot2form, form2ballot, blank_ballot, \
+    sign, uuid, regex_email, SAMPLE, unpack_results
 
 def index():
     return dict()
@@ -17,7 +17,7 @@ def elections():
 def edit():
     response.subtitle = "Edit Ballot"
     db.election.title.default = 'Election title (edit this)'
-    db.election.ballot.default = SAMPLE
+    db.election.ballot_model.default = SAMPLE
     db.election.voters.default = auth.user.email
     db.election.managers.default = auth.user.email
     db.election.secret.default = 'secret-'+uuid()
@@ -29,9 +29,10 @@ def edit():
     return dict(form=form)
 
 def start():    
+    import hashlib
     election = db.election(request.args(0,cast=int)) or redirect('index')
     response.subtitle = election.title+' / Start'
-    demo = ballot2form(election.ballot)
+    demo = ballot2form(election.ballot_model)
     form = FORM(INPUT(_type='submit',_value='Email Voters and Start Election Now!'))
     failures = []
     if form.process().accepted:
@@ -44,18 +45,26 @@ def start():
                 link = URL('vote',args=voter_uuid,scheme='https'))
             if mail.send(to=email,subject=election.title,message=message):
                 if not voter:
-                    db.voter.insert(election_id=election.id,
-                                    voter_uuid=voter_uuid,voted=False,
-                                    email=email,invited_on=request.now)
-                    token_uuid = 'token-'+sign(uuid(),election.secret)
-                    db.token.insert(election_id=election.id,
-                                    token_uuid=token_uuid)
+                    ballot_uuid = 'ballot-'+sign(uuid(),election.secret)
+                    blank_ballot_content = blank_ballot(ballot_uuid)
+                    receipt_uuid = 'receipt-'+\
+                        sign(hashlib.sha1(blank_ballot_content).hexdigest(),
+                             election.secret)
+                    db.voter.insert(
+                        election_id=election.id,
+                        voter_uuid=voter_uuid,voted=False,
+                        email=email,invited_on=request.now)
+                    db.ballot.insert(
+                        election_id=election.id,
+                        ballot_content = blank_ballot_content,
+                        ballot_uuid=ballot_uuid,
+                        receipt_uuid = receipt_uuid)
             else:
                 failures.append(email)
         if not failures:
             session.flash = 'Emails sent successfully'
             redirect(URL('elections'))
-    return dict(demo=demo,form=form,failures=failures)
+    return dict(demo=demo,form=form,failures=failures,election=election)
 
 def results():
     id = request.args(0,cast=int) or redirect(URL('index'))
@@ -64,34 +73,72 @@ def results():
             and request.now>election.deadline):
         session.flash = 'Results not yet available'
         redirect(URL('index'))
-    receipts = db(db.receipt.election_id==election.id).select()
+    voted_ballots = db(db.ballot.election_id==election.id)\
+        (db.ballot.voted==True).select()
     response.subtitle = election.title + ' / Results'
     counters = {}
-    for receipt in receipts:
-        results = unpack_results(receipt.results)
+    for ballot in voted_ballots:
+        results = unpack_results(ballot.results)
         for key in results:
             counters[key] = counters.get(key,0) + results[key]
-    form = ballot2form(election.ballot,counters=counters)
-    return dict(form=form,receipts=receipts,election=election)
+    form = ballot2form(election.ballot_model,counters=counters)
+    return dict(form=form,election=election)
 
-def tokens():
+def ballots():
     election = db.election(request.args(0,cast=int)) or \
         redirect(URL('invalid_link'))
-    response.subtitle = election.title + ' / Tokens'
-    tokens = db(db.token.election_id==election.id).select(
-        orderby=db.token.token_uuid)
-    return dict(tokens=tokens,election=election)
+    response.subtitle = election.title + ' / Ballots'
+    ballots = db(db.ballot.election_id==election.id).select(
+        orderby=db.ballot.ballot_uuid)
+    return dict(ballots=ballots,election=election)
+
+def email_voter_and_managers(election,voter,ballot,message):
+    import cStringIO
+    attachment = mail.Attachment(
+        filename=ballot.receipt_uuid+'.html',
+        payload=cStringIO.StringIO(ballot.ballot_content))
+    for email in regex_email.findall(election.managers):
+        mail.send(to=email,
+                  subject='Copy of Receipt for %s' % election.title,
+                  message=message,attachments=[attachment])
+    return mail.send(to=voter.email,
+                     subject='Receipt for %s' % election.title,
+                     message=message,attachments=[attachment])
+
+def close_election():
+    election = db.election(request.args(0,cast=int)) or \
+        redirect(URL('invalid_link'))
+    response.subtitle = election.title
+    dialog = FORM.confim(T('Close'),
+                         {T('Cancel'):URL('elections')})
+    if dialog.accepted:
+        election.update_record(deadline=request.now)
+        voters = db(db.voter.election_id==election.id)\
+            (db.voter.voted==False).select()
+        ballots = db(db.ballot.election_id==election.id)\
+            (db.ballot.voted==False).select()
+        if len(voters)!=len(ballots):
+            session.flash = 'Voted corrupted ballots/voter mismatch'
+            redirect(URL('elections'))
+        for i in range(len(voters)):
+            voter, ballot = voters[i], ballots[i]
+            message = NOT_VOTED_MESSAGE % dict(            
+                title=election.title,
+                receipt=URL('receipt',args=ballot.receipt_uuid,scheme='http'))
+            email_voter_and_managers(election,voter,ballot,message)
+        session.flash = 'Election Closed!'
+        redirect(URL('results',args=election.id))
+    return dict(dialog=dialog,election=election)
 
 def receipt():
-    receipt = db.receipt(receipt_uuid=request.args(0)) \
+    ballot = db.ballot(receipt_uuid=request.args(0)) \
         or redirect(URL('invalid_link'))
-    election = db.election(receipt.election_id)
+    election = db.election(ballot.election_id)
     response.subtitle = election.title + ' / Receipt'
-    return dict(receipt=receipt)
-
+    return dict(ballot=ballot)
 
 def vote():    
-    import pickle, hashlib, cStringIO
+    import hashlib
     voter_uuid = request.args(0) or redirect('index')
     voter = db.voter(voter_uuid=voter_uuid)
     if not voter:
@@ -107,32 +154,27 @@ def vote():
             session.flash += 'Your vote was NOT recorded'
         redirect(URL('results',args=election.id))
     response.subtitle = election.title + ' / Vote'
-    form = ballot2form(election.ballot,readonly=False)
+    form = ballot2form(election.ballot_model,readonly=False)
     if form.accepted:
         results = {}
-        token = db(db.token.receipt_uuid==None).select(orderby='<random>',
-                                                       limitby=(0,1)).first()
-        if not token: redirect(URL('no_more_tokens'))
-        ballot = form2ballot(election.ballot,token=token.token_uuid,
-                             vars=request.vars,results=results)
+        ballot = db(db.ballot.voted==False).select(
+            orderby='<random>',limitby=(0,1)).first()            
+        if not ballot:
+            redirect(URL('no_more_ballots'))
+        ballot_content = form2ballot(election.ballot_model,
+                                     token=ballot.ballot_uuid,
+                                    vars=request.vars,results=results)
         receipt_uuid = 'receipt-'+\
-            sign(hashlib.sha1(ballot).hexdigest(),election.secret)
-        db.receipt.insert(election_id=election.id,results=str(results),
-                          filled_ballot=ballot,receipt_uuid=receipt_uuid)
-        token.update_record(receipt_uuid=receipt_uuid, voted_on=request.now)
+            sign(hashlib.sha1(ballot_content).hexdigest(),election.secret)
+        ballot.update_record(results=str(results),
+                             ballot_content=ballot_content,
+                             receipt_uuid=receipt_uuid,
+                             voted=True,voted_on=request.now)
         voter.update_record(voted=True)
         message = VOTED_MESSAGE % dict(            
             title=election.title,
             receipt=URL('receipt',args=receipt_uuid,scheme='http'))
-        attachment = mail.Attachment(filename=receipt_uuid+'.html',
-                                     payload=cStringIO.StringIO(ballot))
-        for email in regex_email.findall(election.managers):
-            mail.send(to=email,
-                      subject='Copy of Receipt for %s' % election.title,
-                      message=message,attachments=[attachment])
-        if mail.send(to=voter.email,
-                     subject='Receipt for %s' % election.title,
-                     message=message,attachments=[attachment]):
+        if email_voter_and_managers(election,voter,ballot,message):
             session.flash = 'Your vote was recored and we sent you an email'
         else:
             session.flash = 'Your vote was recored but we failed to email you'
@@ -151,5 +193,5 @@ def voted_already():
 def not_authorized():
     return dict(message='Not Authorized')
 
-def no_more_tokens():
-    return dict(message='No More Tokens / Vote Not recorded')
+def no_more_ballots():
+    return dict(message='Run out of ballots. Your vote was not recorded')

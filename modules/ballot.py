@@ -25,9 +25,9 @@ SAMPLE = """
 <p>or</p>
 
 <table>
-<tr><td>Candidate 1</td><td>{{1}} yes</td><td>{{1}}</td><td>{{1!}} abstain</td></tr>
-<tr><td>Candidate 2</td><td>{{2}} yes</td><td>{{2}}</td><td>{{2!}} abstain</td></tr>
-<tr><td>Candidate 3</td><td>{{3}} yes</td><td>{{3}}</td><td>{{3!}} abstain</td></tr>
+<tr><td>Candidate 1</td><td>{{1}} yes</td><td>{{1}} no</td><td>{{1!}} abstain</td></tr>
+<tr><td>Candidate 2</td><td>{{2}} yes</td><td>{{2}} no</td><td>{{2!}} abstain</td></tr>
+<tr><td>Candidate 3</td><td>{{3}} yes</td><td>{{3}} no</td><td>{{3!}} abstain</td></tr>
 </table>
 """
 
@@ -71,6 +71,11 @@ def form2ballot(ballot,token,vars,results):
         if isinstance(results,dict): results[(name,value)] = checked
         return INPUT(_type="radio",_name=name,_value=value,
                      _disabled=True,_checked=checked).xml()
-    filled_ballot = regex.sub(check,ballot)
-    if token: filled_ballot += '<hr/><pre>\n%s\n</pre><hr/>' % token
-    return '<div class="ballot">%s</div>' % filled_ballot.strip()
+    ballot_content = regex.sub(check,ballot)
+    if token: ballot_content += '<hr/><pre>\n%s\n</pre><hr/>' % token
+    return '<div class="ballot">%s</div>' % ballot_content.strip()
+
+def blank_ballot(token):
+    ballot_content = '<h2>Blank</h2>'
+    if token: ballot_content += '<hr/><pre>\n%s\n</pre><hr/>' % token
+    return '<div class="ballot">%s</div>' % ballot_content

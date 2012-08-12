@@ -2,15 +2,21 @@
 
 <table>
   <tr>
-    <td>{{=A('Create New',_href=URL('edit'),_class="btn")}}</td>
+    <td colspan="2">{{=A('Create New',_href=URL('edit'),_class="btn")}}</td>
     <td></td>
   </tr>
   {{for row in elections:}}
-  <tr style="vertical-align:middle">
+  <tr style="vertical-align:middle"> 
+    {{if row.deadline and row.deadline<request.now:}}
+    <td style="color:red; vertical-align:middle">[closed]</td>
+    {{else:}}
+    <td style="color:green; vertical-align:middle">[open]</td>
+    {{pass}}
     <td style="vertical-align:middle"><b>{{=row.title}}</b></td>
     <td>
       {{=A('Start',_href=URL('start',args=row.id),_class="btn")}}
-      {{=A('Tokens',_href=URL('tokens',args=row.id),_class="btn")}}
+      {{=A('Close',_href=URL('close_election',args=row.id),_class="btn")}}
+      {{=A('Ballots',_href=URL('ballots',args=row.id),_class="btn")}}
       {{=A('Results',_href=URL('results',args=row.id),_class="btn")}}
       {{=A('Edit',_href=URL('edit',args=row.id),_class="btn")}}
     </td>    

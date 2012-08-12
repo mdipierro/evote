@@ -83,7 +83,7 @@
           <span class="icon-bar"></span>
         </a>
 	<a class="brand" href="{{=URL('index',scheme=True)}}">E-Vote</a>
-	<div id="navbar">{{='auth' in globals() and auth.navbar() or ''}}</div>
+	<div id="navbar">{{=auth.user and auth.navbar() or ''}}</div>
 	<div class="nav-collapse">
 	  {{is_mobile=request.user_agent().is_mobile}}
 	  {{if response.menu:}}

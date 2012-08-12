@@ -14,7 +14,7 @@ response.files.append(URL('static','cleditor/jquery.cleditor.table.min.js'))
     <td colspan="2">
       <h3>Ballot</h3>
       <p>This is the text of the ballot. {&#8203;{0}&#8203;} {&#8203;{1}&#8203;} {&#8203;{2}&#8203;} ..., add INPUT radio boxes. Radio boxes with the same number are exclusive.</p>
-      {{=form.custom.widget.ballot}}
+      {{=form.custom.widget.ballot_model}}
     </td>
   </tr>
   <tr>
@@ -43,10 +43,9 @@ response.files.append(URL('static','cleditor/jquery.cleditor.table.min.js'))
 
 <script type="text/javascript">
 jQuery(function() {
-  jQuery("#election_ballot").cleditor({width: '100%'})[0].focus();
+  jQuery("#election_ballot_model").cleditor({width: '100%'})[0].focus();
   jQuery("#election_voters").css({width:'300px'});
   jQuery("#election_managers").css({width:'300px'});
 });
 </script>
-
 
