@@ -1,4 +1,4 @@
-debug_mode = True
+debug_mode = False
 
 from ballot import ballot2form, form2ballot, sign, \
     uuid, regex_email, SAMPLE, unpack_results
@@ -48,7 +48,8 @@ def start():
                                     voter_uuid=voter_uuid,voted=False,
                                     email=email,invited_on=request.now)
                     token_uuid = 'token-'+sign(uuid(),election.secret)
-                    db.token.insert(election_id=election.id,token_uuid=token_uuid)
+                    db.token.insert(election_id=election.id,
+                                    token_uuid=token_uuid)
             else:
                 failures.append(email)
         if not failures:
@@ -99,7 +100,11 @@ def vote():
         redirect(URL('voted_already'))
     election = db.election(voter.election_id)    
     if election.deadline and request.now>election.deadline:
-        session.flash = 'Election is closed'
+        session.flash = 'Election is closed. '
+        if voter.voted:
+            session.flash += 'Your vote was recorded'
+        else:
+            session.flash += 'Your vote was NOT recorded'
         redirect(URL('results',args=election.id))
     response.subtitle = election.title + ' / Vote'
     form = ballot2form(election.ballot,readonly=False)
