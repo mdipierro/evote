@@ -32,7 +32,7 @@ def start():
     election = db.election(request.args(0,cast=int)) or redirect('index')
     response.subtitle = election.title+' / Start'
     demo = ballot2form(election.ballot)
-    form = FORM(INPUT(_type='submit',_value='Email voters to start election'))
+    form = FORM(INPUT(_type='submit',_value='Email Voters and Start Election Now!'))
     failures = []
     if form.process().accepted:
         for email in regex_email.findall(election.voters):
