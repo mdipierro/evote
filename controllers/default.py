@@ -24,7 +24,8 @@ def edit():
     election = db.election(request.args(0,cast=int,default=0))
     if election and not election.created_by==auth.user_id:
         redirect(URL('not_authorized'))
-    form = SQLFORM(db.election,election).process()
+    form = SQLFORM(db.election,election,
+                   submit_button="Save and Preview").process()
     if form.accepted: redirect(URL('start',args=form.vars.id))
     return dict(form=form)
 
