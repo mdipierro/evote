@@ -53,7 +53,7 @@ def start():
                              election.secret)
                     db.voter.insert(
                         election_id=election.id,
-                        voter_uuid=voter_uuid,voted=False,
+                        voter_uuid=voter_uuid,
                         email=email,invited_on=request.now)
                     db.ballot.insert(
                         election_id=election.id,
@@ -98,13 +98,13 @@ def email_voter_and_managers(election,voter,ballot,message):
     attachment = mail.Attachment(
         filename=ballot.receipt_uuid+'.html',
         payload=cStringIO.StringIO(ballot.ballot_content))
-    for email in regex_email.findall(election.managers):
-        mail.send(to=email,
-                  subject='Copy of Receipt for %s' % election.title,
-                  message=message,attachments=[attachment])
-    return mail.send(to=voter.email,
-                     subject='Receipt for %s' % election.title,
-                     message=message,attachments=[attachment])
+    ret = mail.send(to=voter.email,
+                    subject='Receipt for %s' % election.title,
+                    message=message,attachments=[attachment])
+    mail.send(to=regex_email.findall(election.managers),
+              subject='Copy of Receipt for %s' % election.title,
+              message=message,attachments=[attachment])
+    return ret
 
 def close_election():
     election = db.election(request.args(0,cast=int)) or \
@@ -159,7 +159,7 @@ def vote():
     if form.accepted:
         results = {}
         ballot = db(db.ballot.voted==False).select(
-            orderby='<random>',limitby=(0,1)).first()            
+            orderby='<random>',limitby=(0,1)).first()
         if not ballot:
             redirect(URL('no_more_ballots'))
         ballot_content = form2ballot(election.ballot_model,

@@ -16,7 +16,7 @@ db.define_table(
     Field('voter_uuid',writable=False,readable=False),
     Field('election_id',db.election,writable=False),
     Field('email',requires=IS_EMAIL()),
-    Field('voted','boolean'),
+    Field('voted','boolean',default=False),
     Field('invited_on','datetime'))
 
 db.define_table(
