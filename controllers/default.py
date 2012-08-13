@@ -175,9 +175,9 @@ def vote():
             title=election.title,
             receipt=URL('receipt',args=receipt_uuid,scheme='http'))
         if email_voter_and_managers(election,voter,ballot,message):
-            session.flash = 'Your vote was recored and we sent you an email'
+            session.flash = 'Your vote was recorded and we sent you an email'
         else:
-            session.flash = 'Your vote was recored but we failed to email you'
+            session.flash = 'Your vote was recorded but we failed to email you'
         redirect(URL('receipt',args=receipt_uuid))
     return dict(form=form)
 
