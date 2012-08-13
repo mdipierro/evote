@@ -1,5 +1,9 @@
 {{extend 'layout.html'}}
 
+
+{{=A('Election Results',_href=URL('results',args=ballot.election_id),_class="btn")}}
+{{=A('Ballots',_href=URL('ballots',args=ballot.election_id),_class="btn")}}
+
 {{=XML(ballot.ballot_content)}}
 
 <pre>
@@ -9,6 +13,8 @@ Signature: {{=ballot.receipt_uuid}}
 <p>
   The signature is an RSA digital signature generated from the ballot content and and the election private_key</p>
 
-{{=A('Election Results',_href=URL('results',args=ballot.election_id),_class="btn")}}
-{{=A('Ballots',_href=URL('ballots',args=ballot.election_id),_class="btn")}}
+<pre>
+{{=election.public_key}}
+</pre>
+
 

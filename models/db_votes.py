@@ -24,6 +24,7 @@ db.define_table(
     'ballot',
     Field('election_id',db.election),
     Field('ballot_content','text'),  # voted or blank ballot
+    Field('assigned','boolean',default=False),
     Field('voted','boolean',default=False),
     Field('voted_on',default=None),
     Field('results','text',default='{}'),

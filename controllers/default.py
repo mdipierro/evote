@@ -57,7 +57,7 @@ def start_callback():
                 link = URL('vote',args=voter_uuid,scheme='https'))
             if mail.send(to=email,subject=election.title,message=message):
                 if not voter:
-                    ballot_uuid = 'ballot-'+sign(None,election.private_key)
+                    ballot_uuid = 'ballot-'+uuid()
                     blank_ballot_content = blank_ballot(ballot_uuid)
                     receipt_uuid = 'receipt-'+\
                         sign(blank_ballot_content,election.private_key)
@@ -127,8 +127,8 @@ def close_election():
         voters = db(db.voter.election_id==election.id)\
             (db.voter.voted==False).select()
         ballots = db(db.ballot.election_id==election.id)\
-            (db.ballot.voted==False).select()
-        if len(voters)!=len(ballots):
+            (db.ballot.voted==False)(db.ballot.assigned==False).select()
+        if ballots and len(voters)!=len(ballots):
             session.flash = 'Voted corrupted ballots/voter mismatch'
             redirect(URL('elections'))
         for i in range(len(voters)):
@@ -137,6 +137,7 @@ def close_election():
                 title=election.title,
                 receipt=URL('receipt',args=ballot.receipt_uuid,scheme='http'))
             email_voter_and_managers(election,voter,ballot,message)
+            ballot.update_record(assigned=True)
         session.flash = 'Election Closed!'
         redirect(URL('results',args=election.id))
     return dict(dialog=dialog,election=election)
@@ -146,7 +147,7 @@ def receipt():
         or redirect(URL('invalid_link'))
     election = db.election(ballot.election_id)
     response.subtitle = election.title + ' / Receipt'
-    return dict(ballot=ballot)
+    return dict(ballot=ballot,election=election)
 
 def vote():    
     import hashlib
@@ -179,7 +180,7 @@ def vote():
         ballot.update_record(results=str(results),
                              ballot_content=ballot_content,
                              receipt_uuid=receipt_uuid,
-                             voted=True,voted_on=request.now)
+                             voted=True,assigned=True,voted_on=request.now)
         voter.update_record(voted=True)
         message = VOTED_MESSAGE % dict(            
             title=election.title,

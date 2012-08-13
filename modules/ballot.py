@@ -41,11 +41,7 @@ def rsakeys():
 
 def sign(text,privkey_pem):
     privkey = rsa.PrivateKey.load_pkcs1(privkey_pem)
-    if text:
-        signature = base64.b16encode(rsa.sign(text,privkey,'SHA-1'))
-    else:
-        text = uuid()
-        signature = text+'-'+base64.b16encode(rsa.sign(text,privkey,'SHA-1'))
+    signature = base64.b16encode(rsa.sign(text,privkey,'SHA-1'))
     return signature
 
 def unpack_results(results):
@@ -82,10 +78,10 @@ def form2ballot(ballot,token,vars,results):
         return INPUT(_type="radio",_name=name,_value=value,
                      _disabled=True,_checked=checked).xml()
     ballot_content = regex.sub(check,ballot)
-    if token: ballot_content += '<hr/><pre>\n%s\n</pre><hr/>' % token
+    if token: ballot_content += '<pre>\n%s\n</pre>' % token
     return '<div class="ballot">%s</div>' % ballot_content.strip()
 
 def blank_ballot(token):
     ballot_content = '<h2>Blank</h2>'
-    if token: ballot_content += '<hr/><pre>\n%s\n</pre><hr/>' % token
+    if token: ballot_content += '<pre>\n%s\n</pre>' % token
     return '<div class="ballot">%s</div>' % ballot_content
