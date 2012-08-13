@@ -7,7 +7,8 @@ db.define_table(
     Field('voters','text',requires=not_empty),
     Field('managers','text',requires=not_empty),
     Field('deadline','datetime'),
-    Field('secret',writable=False,readable=False),                
+    Field('public_key',writable=False,readable=False),                
+    Field('private_key',writable=False,readable=False),                
     auth.signature,
     format='%(title)s')
 

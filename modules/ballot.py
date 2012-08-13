@@ -1,5 +1,6 @@
 from gluon import *
-import re, hashlib
+import re, hashlib, base64
+import rsa
 from uuid import uuid4
 try:
     import ast
@@ -9,7 +10,6 @@ except:
 
 regex = re.compile('{{(\w+)\!?}}')
 regex_email = re.compile('[\w_\-\.]+\@[\w_\-\.]+')
-
 
 SAMPLE = """
 <h2>Election Title</h2>
@@ -33,10 +33,20 @@ SAMPLE = """
 
 
 def uuid():
-    return str(uuid4()).replace('-','')
+    return str(uuid4()).replace('-','').upper()
 
-def sign(text,secret):
-    return text+'-'+hashlib.sha1(text+secret).hexdigest()
+def rsakeys():
+    (pubkey,privkey) = rsa.newkeys(1024)
+    return (pubkey.save_pkcs1(), privkey.save_pkcs1())
+
+def sign(text,privkey_pem):
+    privkey = rsa.PrivateKey.load_pkcs1(privkey_pem)
+    if text:
+        signature = base64.b16encode(rsa.sign(text,privkey,'SHA-1'))
+    else:
+        text = uuid()
+        signature = text+'-'+base64.b16encode(rsa.sign(text,privkey,'SHA-1'))
+    return signature
 
 def unpack_results(results):
     return ast.literal_eval(results) if have_ast else eval(results)

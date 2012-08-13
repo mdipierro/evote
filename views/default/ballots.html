@@ -1,5 +1,9 @@
 {{extend 'layout.html'}}
 
+<pre>
+{{=election.public_key}}
+</pre>
+
 <table>
   <tr>
     <th>Total Ballots/Voters</th><td>{{=len(ballots)}}</td>
@@ -10,7 +14,7 @@
 </table>
 
 <p>
-  Ballots are generated when the election starts and assign voters when their vote is recorded. The total set of ballots should not change unless the election has been tampered with by an administrator and a new ballot has been fabricated.
+  Ballots are generated when the election starts and assign voters when their vote is recorded. The total set of ballots should not change unless the election has been tampered with by an administrator and a new ballot has been fabricated. The ballot UUID is compreised by an acutal UUID and the RSA signature of the UUID using the election private_key.
 </p>
 
 <table>
@@ -20,10 +24,11 @@
   </tr>
   {{for ballot in ballots:}}
   <tr>
-    <td>
-      {{=A(ballot.ballot_uuid,_href=URL('receipt',args=ballot.receipt_uuid))}}
+    <td width="70%">
+	{{=A(ballot.ballot_uuid[:64]+'...',
+	_href=URL('receipt',args=ballot.receipt_uuid))}}
     </td>
-    <td>
+    <td width="30%">
       {{=ballot.voted_on or 'BLANK'}}
     </td>
   </tr>

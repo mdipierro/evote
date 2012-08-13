@@ -1,7 +1,7 @@
 debug_mode = False
 
 from ballot import ballot2form, form2ballot, blank_ballot, \
-    sign, uuid, regex_email, SAMPLE, unpack_results
+    sign, uuid, regex_email, SAMPLE, unpack_results, rsakeys
 
 def index():
     return dict()
@@ -16,14 +16,17 @@ def elections():
 @auth.requires_login()
 def edit():
     response.subtitle = "Edit Ballot"
-    db.election.title.default = 'Election title (edit this)'
-    db.election.ballot_model.default = SAMPLE
-    db.election.voters.default = auth.user.email
-    db.election.managers.default = auth.user.email
-    db.election.secret.default = 'secret-'+uuid()
     election = db.election(request.args(0,cast=int,default=0))
     if election and not election.created_by==auth.user_id:
         redirect(URL('not_authorized'))
+    if not election:
+        (pubkey, privkey) = rsakeys()
+        db.election.title.default = 'Election title (edit this)'
+        db.election.ballot_model.default = SAMPLE
+        db.election.voters.default = auth.user.email
+        db.election.managers.default = auth.user.email
+        db.election.public_key.default = pubkey
+        db.election.private_key.default = privkey        
     form = SQLFORM(db.election,election,
                    submit_button="Save and Preview").process()
     if form.accepted: redirect(URL('start',args=form.vars.id))
@@ -54,11 +57,10 @@ def start_callback():
                 link = URL('vote',args=voter_uuid,scheme='https'))
             if mail.send(to=email,subject=election.title,message=message):
                 if not voter:
-                    ballot_uuid = 'ballot-'+sign(uuid(),election.secret)
+                    ballot_uuid = 'ballot-'+sign(None,election.private_key)
                     blank_ballot_content = blank_ballot(ballot_uuid)
                     receipt_uuid = 'receipt-'+\
-                        sign(hashlib.sha1(blank_ballot_content).hexdigest(),
-                             election.secret)
+                        sign(blank_ballot_content,election.private_key)
                     db.voter.insert(
                         election_id=election.id,
                         voter_uuid=voter_uuid,
@@ -173,8 +175,7 @@ def vote():
         ballot_content = form2ballot(election.ballot_model,
                                      token=ballot.ballot_uuid,
                                     vars=request.vars,results=results)
-        receipt_uuid = 'receipt-'+\
-            sign(hashlib.sha1(ballot_content).hexdigest(),election.secret)
+        receipt_uuid = 'receipt-'+sign(ballot_content,election.private_key)
         ballot.update_record(results=str(results),
                              ballot_content=ballot_content,
                              receipt_uuid=receipt_uuid,

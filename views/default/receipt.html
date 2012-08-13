@@ -7,8 +7,7 @@ Signature: {{=ballot.receipt_uuid}}
 </pre>
 
 <p>
-  The signature is comprised of two parts. The first part ({{=ballot.receipt_uuid.split('-')[1]}}) is the SHA1 of the submitted ballot. This can be verified independelty by each voter thus proving the ballot has not been altered. The second part ({{=ballot.receipt_uuid.split('-')[2]}}) is the SHA1(first_part+secret) where secret is an election dependent secret salt to prevent forgery of signatures by voters and false claims of voter fraud. The token embedded in the ballot is the ballot id published at the start of election. It guanartees that administrators have not forged this ballot.
-</p>
+  The signature is an RSA digital signature generated from the ballot content and and the election private_key</p>
 
 {{=A('Election Results',_href=URL('results',args=ballot.election_id),_class="btn")}}
 {{=A('Ballots',_href=URL('ballots',args=ballot.election_id),_class="btn")}}
