@@ -29,11 +29,19 @@ def edit():
     if form.accepted: redirect(URL('start',args=form.vars.id))
     return dict(form=form)
 
+@auth.requires_login()
 def start():    
     import hashlib
-    election = db.election(request.args(0,cast=int)) or redirect('index')
+    election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
     response.subtitle = election.title+' / Start'
     demo = ballot2form(election.ballot_model)
+    return dict(demo=demo,election=election)
+
+@auth.requires_login()
+def start_callback():
+    import hashlib
+    election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
+    response.subtitle = election.title+' / Start'
     form = FORM(INPUT(_type='submit',_value='Email Voters and Start Election Now!'))
     failures = []
     if form.process().accepted:
@@ -64,8 +72,8 @@ def start():
                 failures.append(email)
         if not failures:
             session.flash = 'Emails sent successfully'
-            redirect(URL('elections'))
-    return dict(demo=demo,form=form,failures=failures,election=election)
+            redirect(URL('elections'),client_side=True)
+    return dict(form=form,failures=failures,election=election)
 
 def results():
     id = request.args(0,cast=int) or redirect(URL('index'))
@@ -140,7 +148,7 @@ def receipt():
 
 def vote():    
     import hashlib
-    voter_uuid = request.args(0) or redirect('index')
+    voter_uuid = request.args(0) or redirect(URL('index'))
     voter = db.voter(voter_uuid=voter_uuid)
     if not voter:
         redirect(URL('invalid_link'))
