@@ -59,10 +59,9 @@ def start_callback():
             if mail.send(to=email,subject=election.title,message=message):
                 if not voter:
                     ballot_counter+=1
-                    ballot_uuid = '%i-%i' % (election.id,ballot_counter)
-                    blank_ballot_content = blank_ballot(
-                        'ballot-id:'+ballot_uuid)
-                    signature = sign(blank_ballot_content,election.private_key)
+                    ballot_uuid = 'ballot-%i-%i' % (election.id,ballot_counter)
+                    blank_ballot_content = blank_ballot(ballot_uuid)
+                    signature = 'signature-'+sign(blank_ballot_content,election.private_key)
                     db.voter.insert(
                         election_id=election.id,
                         voter_uuid=voter_uuid,
@@ -137,7 +136,7 @@ def close_election():
             voter, ballot = voters[i], ballots[i]
             message = NOT_VOTED_MESSAGE % dict(            
                 title=election.title,signature=ballot.signature,
-                ballot=URL('ballot',args=ballot.ballot_uuid,scheme='http'))
+                link=URL('ballot',args=ballot.ballot_uuid,scheme='http'))
             email_voter_and_managers(election,voter,ballot,message)
             ballot.update_record(assigned=True)
         session.flash = 'Election Closed!'
@@ -146,7 +145,7 @@ def close_election():
 
 def ballot():
     ballot_uuid = request.args(0)
-    election_id = int(ballot_uuid.split('-')[0])
+    election_id = int(ballot_uuid.split('-')[1])
     election = db.election(election_id)  
     ballot = db.ballot(election_id=election.id,ballot_uuid=ballot_uuid) \
         or redirect(URL('invalid_link'))
@@ -178,9 +177,9 @@ def vote():
         if not ballot:
             redirect(URL('no_more_ballots'))
         ballot_content = form2ballot(election.ballot_model,
-                                     token='ballot-id:'+ballot.ballot_uuid,
+                                     token=ballot.ballot_uuid,
                                      vars=request.vars,results=results)
-        signature = sign(ballot_content,election.private_key)
+        signature = 'signature-'+sign(ballot_content,election.private_key)
         ballot.update_record(results=str(results),
                              ballot_content=ballot_content,
                              signature=signature,
@@ -188,7 +187,7 @@ def vote():
         voter.update_record(voted=True)
         message = VOTED_MESSAGE % dict(            
             title=election.title,signature=signature,
-            ballot=URL('ballot',args=ballot.ballot_uuid,scheme='http'))
+            link=URL('ballot',args=ballot.ballot_uuid,scheme='http'))
         if email_voter_and_managers(election,voter,ballot,message):
             session.flash = 'Your vote was recorded and we sent you an email'
         else:
