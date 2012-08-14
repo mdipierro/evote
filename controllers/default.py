@@ -59,10 +59,9 @@ def start_callback():
             if mail.send(to=email,subject=election.title,message=message):
                 if not voter:
                     ballot_counter+=1
-                    ballot_uuid = 'ballot-%i-%i' % (election.id,ballot_counter)
+                    ballot_uuid = '%i-%i' % (election.id,ballot_counter)
                     blank_ballot_content = blank_ballot(ballot_uuid)
-                    signature = 'signature-'+\
-                        sign(blank_ballot_content,election.private_key)
+                    signature = sign(blank_ballot_content,election.private_key)
                     db.voter.insert(
                         election_id=election.id,
                         voter_uuid=voter_uuid,
@@ -146,8 +145,8 @@ def close_election():
 
 def ballot():
     ballot_uuid = request.args(0)
-    election_id = int(ballot_uuid.split('-')[1])
-    election = db.election(election_id)         
+    election_id = int(ballot_uuid.split('-')[0])
+    election = db.election(election_id)  
     ballot = db.ballot(election_id=election.id,ballot_uuid=ballot_uuid) \
         or redirect(URL('invalid_link'))
     response.subtitle = election.title + ' / Ballot'
@@ -180,7 +179,7 @@ def vote():
         ballot_content = form2ballot(election.ballot_model,
                                      token=ballot.ballot_uuid,
                                     vars=request.vars,results=results)
-        signature = 'signature-'+sign(ballot_content,election.private_key)
+        signature = sign(ballot_content,election.private_key)
         ballot.update_record(results=str(results),
                              ballot_content=ballot_content,
                              signature=signature,
