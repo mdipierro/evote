@@ -178,7 +178,7 @@ def vote():
             redirect(URL('no_more_ballots'))
         ballot_content = form2ballot(election.ballot_model,
                                      token=ballot.ballot_uuid,
-                                     vars=request.vars,results=results)
+                                     vars=request.vars,results=results)        
         signature = 'signature-'+sign(ballot_content,election.private_key)
         ballot.update_record(results=str(results),
                              ballot_content=ballot_content,

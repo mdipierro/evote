@@ -63,7 +63,7 @@ def ballot2form(ballot,readonly=False,counters=None,filled=False):
         return INPUT(_type='radio',_name=name,_value=value,
                      _checked=('!' in item.group()),
                      _disabled=readonly).xml()    
-    body = regex.sub(radio,ballot)
+    body = regex.sub(radio,ballot.replace('\r',''))
     form = FORM(XML(body),not readonly and INPUT(_type='submit', _value="Vote!") or '',_class="ballot")
     if not readonly: form.process(formname="ballot")
     return form
@@ -77,7 +77,7 @@ def form2ballot(ballot,token,vars,results):
         if isinstance(results,dict): results[(name,value)] = checked
         return INPUT(_type="radio",_name=name,_value=value,
                      _disabled=True,_checked=checked).xml()
-    ballot_content = regex.sub(check,ballot)
+    ballot_content = regex.sub(check,ballot.replace('\r',''))
     if token: ballot_content += '<pre>\n%s\n</pre>' % token
     return '<div class="ballot">%s</div>' % ballot_content.strip()
 

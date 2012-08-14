@@ -11,10 +11,27 @@
 </pre>
 
 <p>
-  The signature is an RSA digital signature generated from the ballot content and and the election private_key</p>
+  The signature is an RSA digital signature generated from the ballot content and the election private_key</p>
+
+<a href="#" class="btn" onclick="jQuery('#instructions').slideToggle()">Instructions</a>
+
+<div id="instructions" class="hidden">
+
+<p>You can use a Python interepreter to verify the digital signature. Here is the code:</p>
 
 <pre>
+import base64, rsa # install module with "pip install rsa".
+ballot = """
+{{=ballot.ballot_content}}
+""".strip()
+
+signature = base64.b16decode("{{=ballot.signature.split('-')[1]}}")
+
+pk_pem = """
 {{=election.public_key}}
+"""
+
+public_key = rsa.PublicKey.load_pkcs1(pk_pem)
+if rsa.verify(ballot, signature, public_key)==None: print 'success'
 </pre>
-
-
+</div>
