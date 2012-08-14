@@ -21,7 +21,7 @@
   {{for ballot in ballots:}}
   <tr>
     <td>
-      {{=A(ballot.ballot_uuid,_href=URL('receipt',args=ballot.ballot_uuid))}}
+      {{=A(ballot.ballot_uuid,_href=URL('ballot',args=ballot.ballot_uuid))}}
     </td>
     <td>
       {{=ballot.voted_on or 'BLANK'}}

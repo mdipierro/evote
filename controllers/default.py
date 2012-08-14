@@ -60,7 +60,8 @@ def start_callback():
                 if not voter:
                     ballot_counter+=1
                     ballot_uuid = '%i-%i' % (election.id,ballot_counter)
-                    blank_ballot_content = blank_ballot(ballot_uuid)
+                    blank_ballot_content = blank_ballot(
+                        'ballot-id:'+ballot_uuid)
                     signature = sign(blank_ballot_content,election.private_key)
                     db.voter.insert(
                         election_id=election.id,
@@ -177,8 +178,8 @@ def vote():
         if not ballot:
             redirect(URL('no_more_ballots'))
         ballot_content = form2ballot(election.ballot_model,
-                                     token=ballot.ballot_uuid,
-                                    vars=request.vars,results=results)
+                                     token='ballot-id:'+ballot.ballot_uuid,
+                                     vars=request.vars,results=results)
         signature = sign(ballot_content,election.private_key)
         ballot.update_record(results=str(results),
                              ballot_content=ballot_content,
