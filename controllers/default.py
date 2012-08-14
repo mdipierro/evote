@@ -156,6 +156,10 @@ def ballot():
     response.subtitle = election.title + ' / Ballot'
     return dict(ballot=ballot,election=election)
 
+def ballot_verifier():
+    response.headers['Content-Type'] = 'text/plain'
+    return ballot()
+
 def vote():    
     import hashlib
     voter_id = request.args(0,cast=int)

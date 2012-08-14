@@ -11,25 +11,4 @@
 
 {{=A('Election Results',_href=URL('results',args=ballot.election_id),_class="btn")}}
 {{=A('Ballots',_href=URL('ballots',args=ballot.election_id),_class="btn")}}
-{{=A('Instructions',_href='#',_onclick="jQuery('#instructions').slideToggle()",_class="btn")}}
-
-<div id="instructions" class="hidden">
-
-<p>You can use a Python interepreter to verify the digital signature. Here is the code:</p>
-
-<pre>
-import base64, rsa # install module with "pip install rsa".
-ballot = """
-{{=ballot.ballot_content}}
-""".strip()
-
-signature = base64.b16decode("{{=ballot.signature.split('-')[1]}}")
-
-pk_pem = """
-{{=election.public_key.strip()}}
-"""
-
-public_key = rsa.PublicKey.load_pkcs1(pk_pem)
-if rsa.verify(ballot, signature, public_key)==None: print 'success'
-</pre>
-</div>
+{{=A('Ballot Verification Code',_href=URL('ballot_verifier.py',args=request.args),_class="btn")}}
