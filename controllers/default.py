@@ -176,6 +176,8 @@ def vote():
     form = ballot2form(election.ballot_model,readonly=False)
     if form.accepted:
         results = {}
+        # sqlite specific locking logic else do for update
+        db.executesql('begin immediate transaction;')
         ballot = db(db.ballot.voted==False).select(
             orderby='<random>',limitby=(0,1)).first()
         if not ballot:
