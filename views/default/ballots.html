@@ -20,11 +20,10 @@
   </tr>
   {{for ballot in ballots:}}
   <tr>
-    <td width="70%">
-	{{=A(ballot.ballot_uuid[:64]+'...',
-	_href=URL('receipt',args=ballot.receipt_uuid))}}
+    <td>
+      {{=A(ballot.ballot_uuid,_href=URL('receipt',args=ballot.ballot_uuid))}}
     </td>
-    <td width="30%">
+    <td>
       {{=ballot.voted_on or 'BLANK'}}
     </td>
   </tr>

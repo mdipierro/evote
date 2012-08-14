@@ -29,6 +29,6 @@ db.define_table(
     Field('voted_on',default=None),
     Field('results','text',default='{}'),
     Field('ballot_uuid'), # uuid embedded in ballot
-    Field('receipt_uuid')) # signature of ballot (voted or blank)
+    Field('signature')) # signature of ballot (voted or blank)
 
                 
