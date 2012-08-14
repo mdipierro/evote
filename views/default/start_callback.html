@@ -1,0 +1,18 @@
+{{=form}}
+{{=A('Back to Edit',_href=URL('edit',args=election.id),_class="btn")}}
+
+{{if failures:}}
+<h2>We failed email the following voters:</h2>
+<ul>
+  {{for failure in failures:}}
+  <li style="color:red">{{=failure}}</li>
+  {{pass}}
+</ul>
+{{pass}}
+
+<script>
+  jQuery('input[type=submit]').click(function(){
+    jQuery('#demo, #target form, #target a').hide();
+    jQuery('#target').append('<h2>Processing... please wait and no reload<h2><img src="{{=URL('static','images/wait.gif')}}" align="center"/>');
+  });
+</script>

@@ -52,26 +52,30 @@ def start_callback():
         for email in regex_email.findall(election.voters):
             voter = db(db.voter.election_id==election.id)\
                 (db.voter.email==email).select().first()
-            voter_uuid = voter.voter_uuid if voter else 'voter-'+uuid()
-            message = VOTE_MESSAGE % dict(
-                title = election.title,
-                link = URL('vote',args=voter_uuid,scheme='https'))
-            if mail.send(to=email,subject=election.title,message=message):
-                if not voter:
-                    ballot_counter+=1
-                    ballot_uuid = 'ballot-%i-%i' % (election.id,ballot_counter)
-                    blank_ballot_content = blank_ballot(ballot_uuid)
-                    signature = 'signature-'+sign(blank_ballot_content,election.private_key)
-                    db.voter.insert(
-                        election_id=election.id,
-                        voter_uuid=voter_uuid,
-                        email=email,invited_on=request.now)
-                    db.ballot.insert(
-                        election_id=election.id,
-                        ballot_content = blank_ballot_content,
-                        ballot_uuid=ballot_uuid,
-                        signature = signature)
+            if voter:
+                voter_id = voter.id
+                voter_uuid = voter.voter_uuid
             else:
+                # create a voter
+                voter_uuid = 'voter-'+uuid()
+                voter_id = db.voter.insert(
+                    election_id=election.id,
+                    voter_uuid=voter_uuid,
+                    email=email,invited_on=request.now)
+                # create a ballot
+                ballot_counter+=1
+                ballot_uuid = 'ballot-%i-%i' % (election.id,ballot_counter)
+                blank_ballot_content = blank_ballot(ballot_uuid)
+                signature = 'signature-'+sign(blank_ballot_content,
+                                              election.private_key)
+                db.ballot.insert(
+                    election_id=election.id,
+                    ballot_content = blank_ballot_content,
+                    ballot_uuid=ballot_uuid,
+                    signature = signature)
+            link = URL('vote',args=(voter_id,voter_uuid),scheme='https')
+            message = VOTE_MESSAGE % dict(title=election.title,link=link)
+            if not mail.send(to=email,subject=election.title,message=message):
                 failures.append(email)
         if not failures:
             session.flash = 'Emails sent successfully'
@@ -134,9 +138,9 @@ def close_election():
             redirect(URL('elections'))
         for i in range(len(voters)):
             voter, ballot = voters[i], ballots[i]
+            link = URL('ballot',args=ballot.ballot_uuid,scheme='http')
             message = NOT_VOTED_MESSAGE % dict(            
-                title=election.title,signature=ballot.signature,
-                link=URL('ballot',args=ballot.ballot_uuid,scheme='http'))
+                title=election.title,signature=ballot.signature,link=link)
             email_voter_and_managers(election,voter,ballot,message)
             ballot.update_record(assigned=True)
         session.flash = 'Election Closed!'
@@ -144,9 +148,9 @@ def close_election():
     return dict(dialog=dialog,election=election)
 
 def ballot():
-    ballot_uuid = request.args(0)
+    ballot_uuid = request.args(0) or redirect(URL('index'))
     election_id = int(ballot_uuid.split('-')[1])
-    election = db.election(election_id)  
+    election = db.election(election_id) or redirect(URL('index'))
     ballot = db.ballot(election_id=election.id,ballot_uuid=ballot_uuid) \
         or redirect(URL('invalid_link'))
     response.subtitle = election.title + ' / Ballot'
@@ -154,9 +158,9 @@ def ballot():
 
 def vote():    
     import hashlib
-    voter_uuid = request.args(0) or redirect(URL('index'))
-    voter = db.voter(voter_uuid=voter_uuid)
-    if not voter:
+    voter_id = request.args(0,cast=int)
+    voter_uuid = request.args(1)
+    voter = db.voter(voter_id,voter_uuid=voter_uuid) or \
         redirect(URL('invalid_link'))
     if not debug_mode and voter.voted:
         redirect(URL('voted_already'))
