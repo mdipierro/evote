@@ -1,9 +1,5 @@
 {{extend 'layout.html'}}
 
-
-{{=A('Election Results',_href=URL('results',args=ballot.election_id),_class="btn")}}
-{{=A('Ballots',_href=URL('ballots',args=ballot.election_id),_class="btn")}}
-
 {{=XML(ballot.ballot_content)}}
 
 <pre>
@@ -13,7 +9,9 @@
 <p>
   The signature is an RSA digital signature generated from the ballot content and the election private_key</p>
 
-<a href="#" class="btn" onclick="jQuery('#instructions').slideToggle()">Instructions</a>
+{{=A('Election Results',_href=URL('results',args=ballot.election_id),_class="btn")}}
+{{=A('Ballots',_href=URL('ballots',args=ballot.election_id),_class="btn")}}
+{{=A('Instructions',_href='#',_onclick="jQuery('#instructions').slideToggle()",_class="btn")}}
 
 <div id="instructions" class="hidden">
 
@@ -28,7 +26,7 @@ ballot = """
 signature = base64.b16decode("{{=ballot.signature.split('-')[1]}}")
 
 pk_pem = """
-{{=election.public_key}}
+{{=election.public_key.strip()}}
 """
 
 public_key = rsa.PublicKey.load_pkcs1(pk_pem)
