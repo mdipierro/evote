@@ -29,7 +29,7 @@ db.define_table(
     Field('ballot_content','text'),  # voted or blank ballot
     Field('assigned','boolean',default=False),
     Field('voted','boolean',default=False),
-    Field('voted_on',default=None),
+    Field('voted_on','datetime'),
     Field('results','text',default='{}'),
     Field('ballot_uuid'), # uuid embedded in ballot
     Field('signature')) # signature of ballot (voted or blank)
