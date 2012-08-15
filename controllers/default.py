@@ -61,7 +61,7 @@ def start_callback():
                     email=email,invited_on=request.now)
                 # create a ballot
                 ballot_counter+=1
-                ballot_uuid = 'ballot-%i-%i' % (election.id,ballot_counter)
+                ballot_uuid = 'ballot-%i-%.6i' % (election.id,ballot_counter)
                 blank_ballot_content = blank_ballot(ballot_uuid)
                 signature = 'signature-'+sign(blank_ballot_content,
                                               election.private_key)
