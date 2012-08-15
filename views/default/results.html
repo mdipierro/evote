@@ -2,8 +2,8 @@
 
 {{=form}}
 
-<p>Election is completed re-counted every time this page is visited. You can see the invidivual ballots which have been counted and their associated tokens here</p>
+<p>{{=T('Election is completed re-counted every time this page is visited. You can see the invidivual ballots which have been counted and their associated tokens here')}}</p>
 
-{{=A('Ballots',_href=URL('ballots',args=election.id),_class="btn")}}
+{{=A(T('Ballots'),_href=URL('ballots',args=election.id),_class="btn")}}
 
 

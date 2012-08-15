@@ -12,27 +12,40 @@ response.files.append(URL('static','cleditor/jquery.cleditor.table.min.js'))
   </tr>
   <tr>
     <td colspan="2">
-      <h3>Ballot</h3>
-      <p>This is the text of the ballot. {&#8203;{0}&#8203;} {&#8203;{1}&#8203;} {&#8203;{2}&#8203;} ..., add INPUT radio boxes. Radio boxes with the same number are exclusive.</p>
+      <h3>{{=T('Ballot')}}</h3>
+      <p>{{=T('This is the text of the ballot. %s %s %s ..., add INPUT radio boxes. Radio boxes with the same number are exclusive.') % ('{'*2+'0'+'}'*2,
+'{'*2+'1'+'}'*2,'{'*2+'2'+'}'*2)}}</p>
       {{=form.custom.widget.ballot_model}}
     </td>
   </tr>
   <tr>
-    <td><h3>Voters</h3>
-      <p>List of emails of voters.</p>
+    <td><h3>{{=T('Voters')}}</h3>
+      <p>{{=T('List of emails of voters.')}}</p>
       {{=form.custom.widget.voters}}</td>
-    <td><h3>Managers</h3>
-      <p>List of emails of election managers</p>
+    <td><h3>{{=T('Managers')}}</h3>
+      <p>{{=T('List of emails of election managers')}}</p>
       {{=form.custom.widget.managers}}</td>
   </tr>
   <tr>
-    <td colspan="2"><h3>Deadline</h3>
-      <p>Results will be public after the deadline</p>
+    <td colspan="2"><h3>{{=T('Deadline')}}</h3>
+      <p>{{=T('Results will be public after the deadline')}}</p>
       {{=form.custom.widget.deadline}}</td>
   </tr>
-  {{if form.custom.widget.deletable:}}
   <tr>
-    <td colspan="2"><h3>Delete? {{=form.custom.widget.deletable}}</h3></td>
+    <td colspan="2"><h3>{{=T('Text of email with voting link')}}</h3>
+      {{=form.custom.widget.vote_email}}</td>
+  </tr>
+  <tr>
+    <td colspan="2"><h3>{{=T('Text of email for voting receipt')}}</h3>
+      {{=form.custom.widget.voted_email}}</td>
+  </tr>
+  <tr>
+    <td colspan="2"><h3>{{=T('Text of email for non-voters')}}</h3>
+      {{=form.custom.widget.not_voted_email}}</td>
+  </tr>
+  {{if form.custom.deletable:}}
+  <tr>
+    <td colspan="2"><h3>{{=T('Delete?')}} {{=form.custom.deletable}}</h3></td>
   </tr>
   {{pass}}  
   <tr>

@@ -2,7 +2,7 @@
 {{=A('Back to Edit',_href=URL('edit',args=election.id),_class="btn")}}
 
 {{if failures:}}
-<h2>We failed email the following voters:</h2>
+<h2>{{=T('We failed email the following voters')}}</h2>
 <ul>
   {{for failure in failures:}}
   <li style="color:red">{{=failure}}</li>

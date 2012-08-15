@@ -11,27 +11,6 @@ except:
 regex = re.compile('{{(\w+)\!?}}')
 regex_email = re.compile('[\w_\-\.]+\@[\w_\-\.]+')
 
-SAMPLE = """
-<h2>Election Title</h2>
-
-<p>This is a ballot!</p>
-
-<table>
-<tr><td>Candidate 1</td><td>{{0}}</td></tr>
-<tr><td>Candidate 2</td><td>{{0}}</td></tr>
-<tr><td>Candidate 3</td><td>{{0}}</td></tr>
-</table>
-
-<p>or</p>
-
-<table>
-<tr><td>Candidate 1</td><td>{{1}} yes</td><td>{{1}} no</td><td>{{1!}} abstain</td></tr>
-<tr><td>Candidate 2</td><td>{{2}} yes</td><td>{{2}} no</td><td>{{2!}} abstain</td></tr>
-<tr><td>Candidate 3</td><td>{{3}} yes</td><td>{{3}} no</td><td>{{3!}} abstain</td></tr>
-</table>
-"""
-
-
 def uuid():
     return str(uuid4()).replace('-','').upper()
 

@@ -1,33 +1,31 @@
 debug_mode = False
 
 from ballot import ballot2form, form2ballot, blank_ballot, \
-    sign, uuid, regex_email, SAMPLE, unpack_results, rsakeys
+    sign, uuid, regex_email, unpack_results, rsakeys
 
 def index():
     return dict()
 
 @auth.requires_login()
 def elections():
-    response.subtitle = 'My Elections'
+    response.subtitle = T('My Elections')
     elections = db(db.election.created_by==auth.user.id).select(
         orderby=~db.election.created_on)
     return dict(elections=elections)
 
 @auth.requires_login()
 def edit():
-    response.subtitle = "Edit Ballot"
+    response.subtitle = T('Edit Ballot')
     election = db.election(request.args(0,cast=int,default=0))
     if election and not election.created_by==auth.user_id:
         redirect(URL('not_authorized'))
     if not election:
         (pubkey, privkey) = rsakeys()
-        db.election.title.default = 'Election title (edit this)'
-        db.election.ballot_model.default = SAMPLE
         db.election.voters.default = auth.user.email
         db.election.managers.default = auth.user.email
         db.election.public_key.default = pubkey
         db.election.private_key.default = privkey        
-    form = SQLFORM(db.election,election,
+    form = SQLFORM(db.election,election,deletable=True,
                    submit_button="Save and Preview").process()
     if form.accepted: redirect(URL('start',args=form.vars.id))
     return dict(form=form)
@@ -36,7 +34,7 @@ def edit():
 def start():    
     import hashlib
     election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
-    response.subtitle = election.title+' / Start'
+    response.subtitle = election.title+T(' / Start')
     demo = ballot2form(election.ballot_model)
     return dict(demo=demo,election=election)
 
@@ -44,8 +42,8 @@ def start():
 def start_callback():
     import hashlib
     election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
-    response.subtitle = election.title+' / Start'
-    form = FORM(INPUT(_type='submit',_value='Email Voters and Start Election Now!'))
+    form = FORM(INPUT(_type='submit',
+                      _value=T('Email Voters and Start Election Now!')))
     failures = []
     if form.process().accepted:
         ballot_counter = db(db.ballot.election_id==election.id).count()
@@ -53,12 +51,11 @@ def start_callback():
             voter = db(db.voter.election_id==election.id)\
                 (db.voter.email==email).select().first()
             if voter:
-                voter_id = voter.id
                 voter_uuid = voter.voter_uuid
             else:
                 # create a voter
                 voter_uuid = 'voter-'+uuid()
-                voter_id = db.voter.insert(
+                db.voter.insert(
                     election_id=election.id,
                     voter_uuid=voter_uuid,
                     email=email,invited_on=request.now)
@@ -73,25 +70,26 @@ def start_callback():
                     ballot_content = blank_ballot_content,
                     ballot_uuid=ballot_uuid,
                     signature = signature)
-            link = URL('vote',args=(voter_id,voter_uuid),scheme='https')
-            message = VOTE_MESSAGE % dict(title=election.title,link=link)
+            link = URL('vote',args=(election.id,voter_uuid),scheme='https')
+            message = message_replace(election.vote_email,
+                              title=election.title,link=link)
             if not mail.send(to=email,subject=election.title,message=message):
                 failures.append(email)
         if not failures:
-            session.flash = 'Emails sent successfully'
+            session.flash = T('Emails sent successfully')
             redirect(URL('elections'),client_side=True)
     return dict(form=form,failures=failures,election=election)
 
 def results():
     id = request.args(0,cast=int) or redirect(URL('index'))
     election = db.election(id) or redirect(URL('index'))
-    if auth.user_id!=election.created_by and not(election.deadline \
-            and request.now>election.deadline):
-        session.flash = 'Results not yet available'
+    if auth.user_id!=election.created_by and \
+            not(election.deadline and request.now>election.deadline):
+        session.flash = T('Results not yet available')
         redirect(URL('index'))
     voted_ballots = db(db.ballot.election_id==election.id)\
         (db.ballot.voted==True).select()
-    response.subtitle = election.title + ' / Results'
+    response.subtitle = election.title + T(' / Results')
     counters = {}
     for ballot in voted_ballots:
         results = unpack_results(ballot.results)
@@ -103,7 +101,7 @@ def results():
 def ballots():
     election = db.election(request.args(0,cast=int)) or \
         redirect(URL('invalid_link'))
-    response.subtitle = election.title + ' / Ballots'
+    response.subtitle = election.title + T(' / Ballots')
     ballots = db(db.ballot.election_id==election.id).select(
         orderby=db.ballot.ballot_uuid)
     return dict(ballots=ballots,election=election)
@@ -134,13 +132,14 @@ def close_election():
         ballots = db(db.ballot.election_id==election.id)\
             (db.ballot.voted==False)(db.ballot.assigned==False).select()
         if ballots and len(voters)!=len(ballots):
-            session.flash = 'Voted corrupted ballots/voter mismatch'
+            session.flash = T('Voted corrupted ballots/voter mismatch')
             redirect(URL('elections'))
         for i in range(len(voters)):
             voter, ballot = voters[i], ballots[i]
             link = URL('ballot',args=ballot.ballot_uuid,scheme='http')
-            message = NOT_VOTED_MESSAGE % dict(            
-                title=election.title,signature=ballot.signature,link=link)
+            message = message_replace(election.not_voted_message,
+                                      title=election.title,
+                                      signature=ballot.signature,link=link)
             email_voter_and_managers(election,voter,ballot,message)
             ballot.update_record(assigned=True)
         session.flash = 'Election Closed!'
@@ -153,7 +152,7 @@ def ballot():
     election = db.election(election_id) or redirect(URL('index'))
     ballot = db.ballot(election_id=election.id,ballot_uuid=ballot_uuid) \
         or redirect(URL('invalid_link'))
-    response.subtitle = election.title + ' / Ballot'
+    response.subtitle = election.title + T(' / Ballot')
     return dict(ballot=ballot,election=election)
 
 def ballot_verifier():
@@ -162,30 +161,31 @@ def ballot_verifier():
 
 def vote():    
     import hashlib
-    voter_id = request.args(0,cast=int)
+    election_id = request.args(0,cast=int)
     voter_uuid = request.args(1)
-    voter = db.voter(voter_id,voter_uuid=voter_uuid) or \
+    election = db.election(election_id) or redirect(URL('invalid_link'))       
+    voter = db(db.voter.election_id==election_id)\
+        (db.voter.voter_uuid==voter_uuid).select().first() or \
         redirect(URL('invalid_link'))
     if not debug_mode and voter.voted:
         redirect(URL('voted_already'))
-    election = db.election(voter.election_id)    
+    
     if election.deadline and request.now>election.deadline:
-        session.flash = 'Election is closed. '
+        session.flash = T('Election is closed')
         if voter.voted:
-            session.flash += 'Your vote was recorded'
+            session.flash += T('Your vote was recorded')
         else:
-            session.flash += 'Your vote was NOT recorded'
+            session.flash += T('Your vote was NOT recorded')
         redirect(URL('results',args=election.id))
     response.subtitle = election.title + ' / Vote'
     form = ballot2form(election.ballot_model,readonly=False)
     if form.accepted:
         results = {}
-        # sqlite specific locking logic else do for update
-        db.executesql('begin immediate transaction;')
+        for_update = not db._uri.startswith('sqlite') # not suported by sqlite
+        if not for_update: db.executesql('begin immediate transaction;')
         ballot = db(db.ballot.voted==False).select(
-            orderby='<random>',limitby=(0,1)).first()
-        if not ballot:
-            redirect(URL('no_more_ballots'))
+            orderby='<random>',limitby=(0,1),for_update=for_update).first() \
+            or redirect(URL('no_more_ballots'))
         ballot_content = form2ballot(election.ballot_model,
                                      token=ballot.ballot_uuid,
                                      vars=request.vars,results=results)        
@@ -195,13 +195,14 @@ def vote():
                              signature=signature,
                              voted=True,assigned=True,voted_on=request.now)
         voter.update_record(voted=True)
-        message = VOTED_MESSAGE % dict(            
-            title=election.title,signature=signature,
-            link=URL('ballot',args=ballot.ballot_uuid,scheme='http'))
-        if email_voter_and_managers(election,voter,ballot,message):
-            session.flash = 'Your vote was recorded and we sent you an email'
-        else:
-            session.flash = 'Your vote was recorded but we failed to email you'
+        link = URL('ballot',args=ballot.ballot_uuid,scheme='http')
+        message = message_replace(election.voted_email,link=link,
+                                  title=election.title,signature=signature)
+        emailed = email_voter_and_managers(election,voter,ballot,message)
+        session.flash = \
+            T('Your vote was recorded and we sent you an email') \
+            if emailed else \
+            T('Your vote was recorded but we failed to email you')
         redirect(URL('ballot',args=ballot.ballot_uuid))
     return dict(form=form)
 
@@ -209,13 +210,13 @@ def user():
     return dict(form=auth())
 
 def invalid_link():
-    return dict(message='Invalid Link')
+    return dict(message=T('Invalid Link'))
 
 def voted_already():
-    return dict(message='You already voted')
+    return dict(message=T('You already voted'))
 
 def not_authorized():
-    return dict(message='Not Authorized')
+    return dict(message=T('Not Authorized'))
 
 def no_more_ballots():
-    return dict(message='Run out of ballots. Your vote was not recorded')
+    return dict(message=T('Run out of ballots. Your vote was not recorded'))
