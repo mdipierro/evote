@@ -183,7 +183,8 @@ def vote():
         results = {}
         for_update = not db._uri.startswith('sqlite') # not suported by sqlite
         if not for_update: db.executesql('begin immediate transaction;')
-        ballot = db(db.ballot.voted==False).select(
+        ballot = db(db.ballot.election_id==election_id)\
+            (db.ballot.voted==False).select(
             orderby='<random>',limitby=(0,1),for_update=for_update).first() \
             or redirect(URL('no_more_ballots'))
         ballot_content = form2ballot(election.ballot_model,
