@@ -137,7 +137,8 @@ def close_election():
             redirect(URL('elections'))
         for i in range(len(voters)):
             voter, ballot = voters[i], ballots[i]
-            link = URL('ballot',args=ballot.ballot_uuid,scheme='http')
+            link = URL('ballot',args=(ballot.ballot_uuid,ballot.signature),
+                       scheme='http')
             message = message_replace(election.not_voted_email,
                                       title=election.title,
                                       signature=ballot.signature,link=link)

@@ -32,7 +32,6 @@ db.election.voted_email.default = """
 
 Your ballot: {{=link}}
 
-{{=signature}}
 (your voted was recorded, your ballot is also attached)
 
 """
@@ -42,7 +41,6 @@ db.election.not_voted_email.default = """
 
 Your ballot: {{=link}}
 
-{{=signature}}
 (you did not vote, your BLANK ballot is also attached)
 """
 
