@@ -137,7 +137,7 @@ def close_election():
         for i in range(len(voters)):
             voter, ballot = voters[i], ballots[i]
             link = URL('ballot',args=ballot.ballot_uuid,scheme='http')
-            message = message_replace(election.not_voted_message,
+            message = message_replace(election.not_voted_email,
                                       title=election.title,
                                       signature=ballot.signature,link=link)
             email_voter_and_managers(election,voter,ballot,message)
@@ -148,10 +148,14 @@ def close_election():
 
 def ballot():
     ballot_uuid = request.args(0) or redirect(URL('index'))
+    signature = request.args(1)
     election_id = int(ballot_uuid.split('-')[1])
     election = db.election(election_id) or redirect(URL('index'))
     ballot = db.ballot(election_id=election.id,ballot_uuid=ballot_uuid) \
         or redirect(URL('invalid_link'))
+    if (not election.deadline or election.deadline>request.now) \
+            and ballot.signature!=signature:
+        redirect(URL('not_authorized'))
     response.subtitle = election.title + T(' / Ballot')
     return dict(ballot=ballot,election=election)
 
@@ -161,6 +165,7 @@ def ballot_verifier():
 
 def vote():    
     import hashlib
+    response.menu = []
     election_id = request.args(0,cast=int)
     voter_uuid = request.args(1)
     election = db.election(election_id) or redirect(URL('invalid_link'))       
@@ -196,7 +201,9 @@ def vote():
                              signature=signature,
                              voted=True,assigned=True,voted_on=request.now)
         voter.update_record(voted=True)
-        link = URL('ballot',args=ballot.ballot_uuid,scheme='http')
+        
+        link = URL('ballot',args=(ballot.ballot_uuid,ballot.signature),
+                   scheme='http')
         message = message_replace(election.voted_email,link=link,
                                   title=election.title,signature=signature)
         emailed = email_voter_and_managers(election,voter,ballot,message)
@@ -204,7 +211,7 @@ def vote():
             T('Your vote was recorded and we sent you an email') \
             if emailed else \
             T('Your vote was recorded but we failed to email you')
-        redirect(URL('ballot',args=ballot.ballot_uuid))
+        redirect(link)
     return dict(form=form)
 
 def user():
