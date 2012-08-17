@@ -120,6 +120,7 @@ def email_voter_and_managers(election,voter,ballot,message):
     return ret
 
 def close_election():
+    import zipfile, os
     election = db.election(request.args(0,cast=int)) or \
         redirect(URL('invalid_link'))
     response.subtitle = election.title
@@ -142,6 +143,23 @@ def close_election():
                                       signature=ballot.signature,link=link)
             email_voter_and_managers(election,voter,ballot,message)
             ballot.update_record(assigned=True)
+        archive = zipfile.ZipFile(
+            os.path.join(
+                request.folder,'static','zips','%s.zip' % election.id),'w')
+        dbset = db(db.ballot.election_id==election.id)
+        ballots = dbset.select()
+        for ballot in ballots:
+            archive.writestr(ballot.ballot_uuid,ballot.ballot_content)
+        ballots = dbset.select(
+            db.ballot.election_id,
+            db.ballot.ballot_uuid,
+            db.ballot.assigned,
+            db.ballot.voted,
+            db.ballot.voted_on,
+            db.ballot.signature,
+            orderby=db.ballot.ballot_uuid)
+        archive.writestr('ballots.csv',str(ballots))
+        archive.close()
         session.flash = 'Election Closed!'
         redirect(URL('results',args=election.id))
     return dict(dialog=dialog,election=election)
