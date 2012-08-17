@@ -27,3 +27,9 @@
   </tr>
   {{pass}}
 </table>
+
+{{import os}}
+{{if os.path.exists(os.path.join(request.folder,'static','zips','%s.zip' % election.id)):}}
+<a href="{{=URL('static','zips/%s.zip' % election.id)}}" class="btn">downoad ballos</a>
+{{pass}}
+
