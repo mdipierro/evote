@@ -1,0 +1,23 @@
+<p>Check the emails of the voters you want to re-send links to. By default voters who voted are un-checked.</p>
+
+<button class="btn" onclick="jQuery('form').find(':checkbox').attr('checked', 'checked')">Check all</button>
+<button class="btn" onclick="jQuery('form').find(':checkbox').attr('checked', false)">Uncheck all</button>
+
+{{=form}}
+{{=A('Back to Edit',_href=URL('edit',args=election.id),_class="btn")}}
+
+{{if failures:}}
+<h2>{{=T('We failed email the following voters')}}</h2>
+<ul>
+  {{for failure in failures:}}
+  <li style="color:red">{{=failure}}</li>
+  {{pass}}
+</ul>
+{{pass}}
+
+<script>
+  jQuery('input[type=submit]').click(function(){
+    jQuery('#demo, #target form, #target a').hide();
+    jQuery('#target').append('<h2>Processing... please wait and no reload<h2><img src="{{=URL('static','images/wait.gif')}}" align="center"/>');
+  });
+</script>

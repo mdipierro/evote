@@ -24,7 +24,8 @@ db.election.vote_email.default = """
 {{=title}}
 
 Link to vote: {{=link}}
-
+Link to ballots: {{=link_ballots}}
+Link to results: {{=link_results}}
 """
 
 db.election.voted_email.default = """
@@ -33,7 +34,6 @@ db.election.voted_email.default = """
 Your ballot: {{=link}}
 
 (your voted was recorded, your ballot is also attached)
-
 """
 
 db.election.not_voted_email.default = """
@@ -41,10 +41,12 @@ db.election.not_voted_email.default = """
 
 Your ballot: {{=link}}
 
+{{=signature}}
 (you did not vote, your BLANK ballot is also attached)
 """
 
 def message_replace(message,**vars):
+    message = 'Election N.{{=election_id}} by {{=owner_email}}\n\n' + message
     for key in vars:
-        message = message.replace('{{=%s}}' %key,vars[key])
+        message = message.replace('{{=%s}}' % key, str(vars[key]))
     return message

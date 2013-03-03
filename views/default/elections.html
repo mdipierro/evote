@@ -15,6 +15,7 @@
     <td style="vertical-align:middle"><b>{{=row.title}}</b></td>
     <td>
       {{=A(T('Start'),_href=URL('start',args=row.id),_class="btn")}}
+      {{=A(T('Remind'),_href=URL('reminders',args=row.id),_class="btn")}}
       {{=A(T('Close'),_href=URL('close_election',args=row.id),_class="btn")}}
       {{=A(T('Ballots'),_href=URL('ballots',args=row.id),_class="btn")}}
       {{=A(T('Results'),_href=URL('results',args=row.id),_class="btn")}}

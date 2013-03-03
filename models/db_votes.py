@@ -9,6 +9,7 @@ db.define_table(
     Field('deadline','datetime'),
     Field('vote_email','text'),
     Field('voted_email','text'),
+    Field('email_sender',requires=IS_EMAIL(),default='i.vote.secure@gmail.com'),
     Field('not_voted_email','text'),
     Field('public_key',writable=False,readable=False),                
     Field('private_key',writable=False,readable=False),                
@@ -29,9 +30,7 @@ db.define_table(
     Field('ballot_content','text'),  # voted or blank ballot
     Field('assigned','boolean',default=False),
     Field('voted','boolean',default=False),
-    Field('voted_on','datetime'),
+    Field('voted_on','datetime',default=None),
     Field('results','text',default='{}'),
     Field('ballot_uuid'), # uuid embedded in ballot
     Field('signature')) # signature of ballot (voted or blank)
-
-                
