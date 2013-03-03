@@ -33,7 +33,7 @@ db.election.voted_email.default = """
 
 Your ballot: {{=link}}
 
-(your voted was recorded, your ballot is also attached)
+(your vote was recorded and a copy of your ballot is attached)
 """
 
 db.election.not_voted_email.default = """
