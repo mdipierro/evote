@@ -31,9 +31,13 @@ Link to results: {{=link_results}}
 db.election.voted_email.default = """
 {{=title}}
 
-Your ballot: {{=link}}
+You have voted and your has been registered. Thank you!
+Here is your ballot.
 
-(your vote was recorded and a copy of your ballot is attached)
+Your ballot: {{=link}}
+A copy is also attached.
+
+Keep it to verify the integrity of the election.
 """
 
 db.election.not_voted_email.default = """
