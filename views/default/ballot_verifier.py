@@ -1,6 +1,6 @@
 ####################################################################
 # This is a python program that allows you to verify your ballot   #
-# using the RSA algorithm. It requires the Pyhton interpreter from #
+# using the RSA algorithm. It requires the Python interpreter from #
 #   http://python.org                                              #
 # it also requires the RSA module which you can install with       #
 #   pip install rsa                                                #
