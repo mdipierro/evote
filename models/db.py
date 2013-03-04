@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-
 DEVELOPMENT = False
+
+request.now = request.utcnow
 
 # connect to database
 db = DAL('sqlite://storage.sqlite')
