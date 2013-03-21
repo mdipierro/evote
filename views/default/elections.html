@@ -19,6 +19,7 @@
       {{=A(T('Close'),_href=URL('close_election',args=row.id),_class="btn")}}
       {{=A(T('Ballots'),_href=URL('ballots',args=row.id),_class="btn")}}
       {{=A(T('Results'),_href=URL('results',args=row.id),_class="btn")}}
+      {{=A(T('CSV Voters'),_href=URL('voters_csv.csv',args=row.id),_class="btn")}}
       {{=A(T('Edit'),_href=URL('edit',args=row.id),_class="btn")}}
     </td>    
   </tr>

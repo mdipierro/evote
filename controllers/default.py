@@ -341,3 +341,9 @@ def not_authorized():
 
 def no_more_ballots():
     return dict(message=T('Run out of ballots. Your vote was not recorded'))
+
+@auth.requires_login()
+def voters_csv():
+    election = db.election(request.args(0,cast=int,default=0),created_by=auth.user.id)
+    return db(db.voter.election_id==election.id).select(
+        db.voter.election_id,db.voter.email,db.voter.voted).as_csv()
