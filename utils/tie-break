@@ -41,7 +41,7 @@ if __name__ == '__main__':
         catenations = []
         for token in args.rank:
             rest = [t for t in args.rank if t != token]
-            catenation = [token] + rest
+            catenation = [token] + sorted(rest)
             catenations.append(catenation)
         for n, catenation in enumerate(sorted(catenations, key=sha_sort)):
             note = "SHA(%s)" % "".join(catenation)
