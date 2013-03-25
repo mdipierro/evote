@@ -38,10 +38,10 @@ if __name__ == '__main__':
         PUBLIC.append("User identity is '%s'" % args.whoami)
 
     if args.rank:
+        tokens = sorted(args.rank)
         catenations = []
-        for token in args.rank:
-            rest = [t for t in args.rank if t != token]
-            catenation = [token] + sorted(rest)
+        for token in tokens:
+            catenation = [token,"{+}"] + tokens
             catenations.append(catenation)
         for n, catenation in enumerate(sorted(catenations, key=sha_sort)):
             note = "SHA(%s)" % "".join(catenation)
