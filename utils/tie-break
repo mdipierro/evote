@@ -45,7 +45,7 @@ if __name__ == '__main__':
             catenations.append(catenation)
         for n, catenation in enumerate(sorted(catenations, key=sha_sort)):
             note = "SHA(%s)" % "".join(catenation)
-            PUBLIC.append("Rank %d: '%s' [%s]" % (n+1, catenation[0], note))
+            PUBLIC.append("Rank %d: %r # %s" % (n+1, catenation[0], note))
 
     if args.recipients:
         send(args.recipients, message=PUBLIC)
