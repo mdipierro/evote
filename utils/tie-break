@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+import argparse, sys, os, hashlib, socket
+
+def getargs():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--whoami', '-u', action='store', 
+                        default="%s@%s" % (os.getenv('USER'), socket.gethostname()),
+                        help="Specify the identity of this user")
+    parser.add_argument('--recipients', '-r', action='append', 
+                        help="A comma separated list of recipients to the command output")
+    parser.add_argument('--token', '-t', action='store',
+                        help="The secret token selected by this user")
+    parser.add_argument('--rank', '-s', action='append',
+                        help="Given a set of tokens, produce a ranked order of them")
+    return parser.parse_args()
+
+def send(recipients, message):
+    for recipient in recipients:
+        print("Publishing public message to '%s'" % recipient)
+        # TODO: Here is where we would send email, post to website, etc.
+
+def sha_sort(l):
+    key = "".join(l).encode('utf-8')
+    return hashlib.sha1(key).digest()
+
+if __name__ == '__main__':
+    args = getargs()
+    PUBLIC = []
+    if args.token:
+        if args.rank:
+            print("ERROR: may only do one of rank tokens and commit tokens, see --help",
+                  file=sys.stderr)
+            sys.exit()
+
+        commitment = hashlib.sha1(args.token.encode('utf-8')).hexdigest()
+        print("PRIVATE: you gave the token '%s'" % args.token, file=sys.stderr)
+        PUBLIC.append("Token commitment is '%s'" % commitment)
+        PUBLIC.append("User identity is '%s'" % args.whoami)
+
+    if args.rank:
+        tokens = sorted(args.rank)
+        catenations = []
+        for token in tokens:
+            catenation = [token,"{+}"] + tokens
+            catenations.append(catenation)
+        for n, catenation in enumerate(sorted(catenations, key=sha_sort)):
+            note = "SHA(%s)" % "".join(catenation)
+            PUBLIC.append("Rank %d: %r # %s" % (n+1, catenation[0], note))
+
+    if args.recipients:
+        send(args.recipients, message=PUBLIC)
+
+    for line in PUBLIC:
+        print("PUBLIC: %s" % line)
