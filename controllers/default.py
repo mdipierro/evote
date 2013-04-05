@@ -12,7 +12,8 @@ def elections():
     elections = db(db.election.created_by==auth.user.id).select(
         orderby=~db.election.created_on)
     ballots = db(db.voter.email == auth.user.email)(
-        db.voter.voted==False)(db.voter.election_id==db.election.id).select()
+        db.voter.voted==False)(db.voter.election_id==db.election.id)(
+        (db.election.deadline==None)|(db.election.deadline>request.now)).select()
     return dict(elections=elections,ballots=ballots)
 
 @auth.requires_login()
@@ -187,13 +188,22 @@ def results():
     form = ballot2form(election.ballot_model,counters=counters)
     return dict(form=form,election=election)
 
+def hash_ballot(text):
+    import re
+    text = text.replace('checked="checked" ','')
+    text = text.replace('disabled="disabled" ','')
+    text = re.sub('ballot\S+','',text)
+    return hash(text)
+
 def ballots():
     election = db.election(request.args(0,cast=int)) or \
         redirect(URL('invalid_link'))
     response.subtitle = election.title + T(' / Ballots')
-    ballots = db(db.ballot.election_id==election.id).select(
+    ballots = db(db.ballot.election_id==election.id).select(        
         orderby=db.ballot.ballot_uuid)
-    return dict(ballots=ballots,election=election)
+    tampered = len(set(hash_ballot(b.ballot_content) 
+                       for b in ballots if b.voted))>1
+    return dict(ballots=ballots,election=election, tampered=tampered)
 
 def email_voter_and_managers(election,voter,ballot,message):
     import cStringIO

@@ -11,6 +11,10 @@
 
 <p>{{=T('Ballots are generated when the election starts and ballot-ids are assigned to voters when their vote is cast. The enumerated collection of ballots will not change unless the election has been tampered with. The ballot UUID is comprised of an actual UUID and an RSA signature of the UUID using the election private_key.')}}</p>
 
+{{if tampered:}}
+<div style="width:100%; background-color:red; color:white; padding:20px; text-align:center">Ballot text has been edited during the election</div>
+{{pass}}
+
 <table>
   <tr>
     <th>{{=T('Ballot Id')}}</th>
