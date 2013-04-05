@@ -1,6 +1,25 @@
 {{extend 'layout.html'}}
 
-<table>
+{{if ballots:}}
+<h2>Elections waiting for your vote</h2>
+
+<table class="table">
+  {{for ballot in ballots:}}
+  <tr>
+    <td>
+      {{=ballot.election.title}} ({{=ballot.election.id}})
+    </td>
+    <td>
+      <a class="btn" href="{{=URL('vote',args=(ballot.election.id,ballot.voter.voter_uuid))}}">Vote</a>
+    </td>
+  </tr>
+  {{pass}}
+</table>
+{{pass}}
+
+<h2>Election you manage</h2>
+
+<table class="table>>
   <tr>
     <td colspan="2">{{=A(T('Create New'),_href=URL('edit'),_class="btn")}}</td>
     <td></td>

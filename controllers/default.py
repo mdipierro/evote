@@ -11,7 +11,9 @@ def elections():
     response.subtitle = T('My Elections')
     elections = db(db.election.created_by==auth.user.id).select(
         orderby=~db.election.created_on)
-    return dict(elections=elections)
+    ballots = db(db.voter.email == auth.user.email)(
+        db.voter.voted==False)(db.voter.election_id==db.election.id).select()
+    return dict(elections=elections,ballots=ballots)
 
 @auth.requires_login()
 def edit():
