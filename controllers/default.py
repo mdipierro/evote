@@ -151,11 +151,15 @@ def reminders_callback():
                             label = voter.email))
         if key in request.post_vars:            
             link = URL('vote',args=(election.id,voter_uuid),scheme='https')
+            link_ballots = URL('ballots',args=election.id,scheme='https')
+            link_results = URL('results',args=election.id,scheme='https')
             message = message_replace(election.vote_email,
                                       election_id = election.id,
                                       owner_email = owner_email,
                                       title=election.title,
-                                      link=link)
+                                      link=link,
+                                      link_ballots=link_ballots,
+                                      link_results=link_results)
             subject = '%s [%s]' % (election.title, election.id)
             emails.append((email,subject,message))
     form = SQLFORM.factory(*fields).process()
