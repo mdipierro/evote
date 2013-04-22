@@ -1,4 +1,6 @@
 {{extend 'layout.html'}}
 
+<h1>{{=T('Resend voting link to voters')}}</h1>
+
 {{=LOAD('default','reminders_callback',args=election.id,ajax=True,target='target')}}
 

@@ -1,10 +1,13 @@
 <p>Check the emails of the voters you want to re-send links to. By default voters who voted are un-checked.</p>
 
+{{=A('Back to Edit',_href=URL('edit',args=election.id),_class="btn")}}
 <button class="btn" onclick="jQuery('form').find(':checkbox').attr('checked', 'checked')">Check all</button>
 <button class="btn" onclick="jQuery('form').find(':checkbox').attr('checked', false)">Uncheck all</button>
 
+<h2>{{=T('Voters who have not yet voted')}}</h2>
+
+{{form.element('input[type=submit]').add_class('btn btn-primary')}}
 {{=form}}
-{{=A('Back to Edit',_href=URL('edit',args=election.id),_class="btn")}}
 
 {{if failures:}}
 <h2>{{=T('We failed email the following voters')}}</h2>

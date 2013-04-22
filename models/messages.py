@@ -54,3 +54,9 @@ def message_replace(message,**vars):
     for key in vars:
         message = message.replace('{{=%s}}' % key, str(vars[key]))
     return message
+
+def meta_send(*args, **kwargs):
+    if kwargs.get('sender') == 'i.vote.secure@gmail.com' and GMAIL_LOGIN:
+        mail.settings.server = 'smtp.gmail.com:587'
+        mail.settings.login = GMAIL_LOGIN
+    return mail.send(*args, **kwargs)

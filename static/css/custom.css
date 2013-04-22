@@ -3476,6 +3476,7 @@ background-image: -webkit-gradient(
 
 /*Footer Start*/
 #footer {
+    margin-top: 50px;
     width: 100%;        
 }
 .footer-top {

@@ -1,7 +1,8 @@
 debug_mode = False
 
 from ballot import ballot2form, form2ballot, blank_ballot, \
-    sign, uuid, regex_email, unpack_results, rsakeys
+    sign, uuid, regex_email, unpack_results, rsakeys, \
+    pack_counters, unpack_counters
 
 def index():
     return dict()
@@ -74,9 +75,9 @@ def start_callback():
                     ballot_content = blank_ballot_content,
                     ballot_uuid=ballot_uuid,
                     signature = signature)
-            link_vote = URL('vote',args=(election.id,voter_uuid),scheme='https')
-            link_ballots = URL('ballots',args=election.id,scheme='https')
-            link_results = URL('results',args=election.id,scheme='https')
+            link_vote = URL('vote',args=(election.id,voter_uuid),scheme=SCHEME)
+            link_ballots = URL('ballots',args=election.id,scheme=SCHEME)
+            link_results = URL('results',args=election.id,scheme=SCHEME)
             message = message_replace(election.vote_email,
                                       election_id = election.id,
                                       owner_email = owner_email,
@@ -89,7 +90,7 @@ def start_callback():
         db.commit()
         sender = election.email_sender or mail.settings.sender
         for to, subject, message in emails:
-            if not mail.send(to=to,subject=subject,message=message,
+            if not meta_send(to=to,subject=subject,message=message,
                              sender=sender, reply_to=sender):
                 failures.append(email)
         if not failures:
@@ -111,9 +112,9 @@ def self_service():
         if voter.voted:
             response.flash = T('User has voted alreday')
         else:
-            link_vote = URL('vote',args=(election.id,voter_uuid),scheme='https')
-            link_ballots = URL('ballots',args=election.id,scheme='https')
-            link_results = URL('results',args=election.id,scheme='https')
+            link_vote = URL('vote',args=(election.id,voter_uuid),scheme=SCHEME)
+            link_ballots = URL('ballots',args=election.id,scheme=SCHEME)
+            link_results = URL('results',args=election.id,scheme=SCHEME)
             message = message_replace(election.vote_email,
                                       election_id = election.id,
                                       owner_email = owner_email,
@@ -122,7 +123,7 @@ def self_service():
                                       link_ballots=link_ballots,
                                       link_results=link_results)
             sender = election.email_sender or mail.settings.sender
-            if mail.send(to=voter.email,subject=election.title,message=message,
+            if meta_send(to=voter.email,subject=election.title,message=message,
                          sender=sender, reply_to=sender):
                 response.flash = T('Email sent')
             else:
@@ -151,9 +152,9 @@ def reminders_callback():
         fields.append(Field(key,'boolean',default=not voter.voted,
                             label = voter.email))
         if key in request.post_vars:            
-            link = URL('vote',args=(election.id,voter_uuid),scheme='https')
-            link_ballots = URL('ballots',args=election.id,scheme='https')
-            link_results = URL('results',args=election.id,scheme='https')
+            link = URL('vote',args=(election.id,voter_uuid),scheme=SCHEME)
+            link_ballots = URL('ballots',args=election.id,scheme=SCHEME)
+            link_results = URL('results',args=election.id,scheme=SCHEME)
             message = message_replace(election.vote_email,
                                       election_id = election.id,
                                       owner_email = owner_email,
@@ -167,13 +168,23 @@ def reminders_callback():
     if form.accepted:
         sender = election.email_sender or mail.settings.sender
         for to, subject, message in emails:
-            if not mail.send(to=to,subject=subject,message=message,
+            if not meta_send(to=to,subject=subject,message=message,
                              sender=sender, reply_to=sender):
                 failures.append(email)
         if not failures:
             session.flash = T('Emails sent successfully')
             redirect(URL('elections'),client_side=True)
     return dict(form=form,failures=failures,election=election)
+
+def compute_results(election):
+    voted_ballots = db(db.ballot.election_id==election.id
+                       )(db.ballot.voted==True).select()
+    counters = {}
+    for ballot in voted_ballots:
+        results = unpack_results(ballot.results)
+        for key in results:
+            counters[key] = counters.get(key,0) + results[key]
+    election.update_record(counters=pack_counters(counters))
 
 @cache(request.env.path_info,time_expire=300,cache_model=cache.ram)
 def results():
@@ -183,15 +194,11 @@ def results():
             not(election.deadline and request.now>election.deadline):
         session.flash = T('Results not yet available')
         redirect(URL('index'))
-    voted_ballots = db(db.ballot.election_id==election.id)\
-        (db.ballot.voted==True).select()
     response.subtitle = election.title + T(' / Results')
-    counters = {}
-    for ballot in voted_ballots:
-        results = unpack_results(ballot.results)
-        for key in results:
-            counters[key] = counters.get(key,0) + results[key]
-    form = ballot2form(election.ballot_model,counters=counters)
+    if not election.counters:
+        compute_results(election)
+    form = ballot2form(election.ballot_model,
+                       counters=unpack_counters(election.counters))
     return dict(form=form,election=election)
 
 def hash_ballot(text):
@@ -217,11 +224,11 @@ def email_voter_and_managers(election,voter,ballot,message):
         filename=ballot.ballot_uuid+'.html',
         payload=cStringIO.StringIO(ballot.ballot_content))
     sender = election.email_sender or mail.settings.sender
-    ret = mail.send(to=voter.email,
+    ret = meta_send(to=voter.email,
                     subject='Receipt for %s' % election.title,
                     message=message,attachments=[attachment],
                     sender=sender, reply_to=sender)
-    mail.send(to=regex_email.findall(election.managers),
+    meta_send(to=regex_email.findall(election.managers),
               subject='Copy of Receipt for %s' % election.title,
               message=message,attachments=[attachment],
               sender=sender, reply_to=sender)
@@ -254,9 +261,12 @@ def close_election():
                                       signature=ballot.signature,link=link)
             email_voter_and_managers(election,voter,ballot,message)
             ballot.update_record(assigned=True)
+        compute_results(election)
+        zippath = os.path.join(request.folder,'static','zips')
+        if not os.path.exists(zippath):
+            os.mkdir(zippath)
         archive = zipfile.ZipFile(
-            os.path.join(
-                request.folder,'static','zips','%s.zip' % election.id),'w')
+            os.path.join(zippath,'%s.zip' % election.id),'w')
         dbset = db(db.ballot.election_id==election.id)
         ballots = dbset.select()
         for ballot in ballots:

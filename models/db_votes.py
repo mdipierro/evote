@@ -13,6 +13,7 @@ db.define_table(
     Field('not_voted_email','text'),
     Field('public_key',writable=False,readable=False),                
     Field('private_key',writable=False,readable=False),                
+    Field('counters','text',writable=False,readable=False),                
     auth.signature,
     format='%(title)s')
 

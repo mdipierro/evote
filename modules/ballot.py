@@ -1,6 +1,7 @@
 from gluon import *
 import re, hashlib, base64
 import rsa
+import cPickle as pickle
 from uuid import uuid4
 try:
     import ast
@@ -33,12 +34,13 @@ def ballot2form(ballot,readonly=False,counters=None,filled=False):
     def radio(item):        
         name = "ck_"+item.group(1)       
         value = radioes[name] = radioes.get(name,0)+1        
+        key = (name,value)
         if isinstance(counters,dict):
             return INPUT(_type='text',_readonly=True,
-                         _value=counters.get((name,value),0),
+                         _value=counters.get(key,0),
                          _style="width:3em").xml()
         if not counters is None and 'x' in item.group().lower():
-            counters[name,value] = counters.get((name,value),0)+1            
+            counters[key] = counters.get(key,0)+1            
         return INPUT(_type='radio',_name=name,_value=value,
                      _checked=('!' in item.group()),
                      _disabled=readonly).xml()    
@@ -64,3 +66,9 @@ def blank_ballot(token):
     ballot_content = '<h2>Blank</h2>'
     if token: ballot_content += '<pre>\n%s\n</pre>' % token
     return '<div class="ballot">%s</div>' % ballot_content
+
+def pack_counters(counters):
+    return pickle.dumps(counters)
+
+def unpack_counters(counters):
+    return pickle.loads(counters)
