@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-DEVELOPMENT = False
-
 request.now = request.utcnow
 
 # connect to database
-db = DAL('sqlite://storage.sqlite')
+db = DAL(DBURI)
 
 from gluon.tools import Auth, Crud, Service, PluginManager, prettydate
 auth = Auth(db)
@@ -17,9 +15,9 @@ auth.define_tables(username=False, signature=False)
 mail=auth.settings.mailer
 
 #mail.settings.server='smtp.gmail.com:587'
-mail.settings.server = 'logging' if DEVELOPMENT else 'localhost'
-mail.settings.sender = 'i.vote.secure@gmail.com'
-mail.settings.login = None
+mail.settings.server = 'logging' if DEVELOPMENT else EMAIL_SERVER
+mail.settings.sender = EMAIL_SENDER
+mail.settings.login = EMAIL_LOGIN
 
 ## configure auth policy
 auth.settings.registration_requires_verification = True
