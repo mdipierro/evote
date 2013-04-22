@@ -43,8 +43,9 @@ def start():
 @auth.requires_login()
 def start_callback():
     election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
-    form = FORM(INPUT(_type='submit',
-                      _value=T('Email Voters and Start Election Now!')))
+    form = SQLFORM.factory(
+        submit_button=T('Email Voters and Start Election Now!'))
+    form.element(_type='submit').add_class('btn')
     failures = []
     emails = []
     owner_email = election.created_by.email
@@ -174,6 +175,7 @@ def reminders_callback():
             redirect(URL('elections'),client_side=True)
     return dict(form=form,failures=failures,election=election)
 
+@cache(request.env.path_info,time_expire=300,cache_model=cache.ram)
 def results():
     id = request.args(0,cast=int) or redirect(URL('index'))
     election = db.election(id) or redirect(URL('index'))
@@ -246,7 +248,7 @@ def close_election():
             voter, ballot = voters[i], ballots[i]
             link = URL('ballot',args=ballot.ballot_uuid,scheme='http')
             message = message_replace(election.not_voted_email,
-                                      election_id=election_id,
+                                      election_id=election.id,
                                       owner_email = owner_email,
                                       title=election.title,
                                       signature=ballot.signature,link=link)
@@ -363,3 +365,12 @@ def voters_csv():
     election = db.election(request.args(0,cast=int,default=0),created_by=auth.user.id)
     return db(db.voter.election_id==election.id).select(
         db.voter.election_id,db.voter.email,db.voter.voted).as_csv()
+
+def features():
+    return locals()
+
+def support():
+    return locals()
+
+def contactus():
+    redirect('http://www.experts4solutions.com')

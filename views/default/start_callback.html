@@ -1,5 +1,8 @@
-{{=form}}
+
+{{=form.custom.begin}}
+{{=form.custom.submit}}
 {{=A('Back to Edit',_href=URL('edit',args=election.id),_class="btn")}}
+{{=form.custom.end}}
 
 {{if failures:}}
 <h2>{{=T('We failed email the following voters')}}</h2>

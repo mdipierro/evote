@@ -43,7 +43,7 @@ def ballot2form(ballot,readonly=False,counters=None,filled=False):
                      _checked=('!' in item.group()),
                      _disabled=readonly).xml()    
     body = regex.sub(radio,ballot.replace('\r',''))
-    form = FORM(XML(body),not readonly and INPUT(_type='submit', _value="Vote!") or '',_class="ballot")
+    form = FORM(XML(body),not readonly and INPUT(_type='submit', _value="Submit You Ballot!") or '',_class="ballot")
     if not readonly: form.process(formname="ballot")
     return form
 

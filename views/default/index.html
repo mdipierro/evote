@@ -1,8 +1,45 @@
 {{extend 'layout.html'}}
 
 <center>
-<img src="{{=URL('static','images/vote.png')}}" />
-<h2>{{=T('Free Secure Trusted Verifiable Online Voting')}}</h2>
+<h1>Free Secure Trusted Verifiable Online Voting</h1>
 </center>
 
-{{=T('This is an electornic system for online verifiable voting. You can login and create a ballot using a Word-like interface and register list of voters. We email each voter a unique link to vote. We count the votes and issue results. Upon voting each voter is issued a receipt by email. The receipt contains an anonymized copy of the ballot. The anonymized copies of the ballots are also sent to the administrator and published. This allows each user, at any time, to check that their vote has been counted. The ballots are digitally signed to make sure they have not been tampered with. Each ballot has a unique ID the ballot IDs are published to prevent counterfit ballots.')}}
+
+<div class="row show-grid hero-list features-list">
+  <div class="span3">
+    <div class="image-wrapper">
+      <img alt="" src="{{=prefix}}img/home_grid.png" />
+    </div>
+    <h2>Easy to Use</h2>
+    <p>We run as a service, you can create one or many polls/elections, customize ballots, and we run the elections.
+      <a href="{{=URL('features')}}">Learn more&nbsp;&raquo;</a>
+    </p>
+  </div>
+  <div class="span3">
+    <div class="image-wrapper">
+      <img alt="" src="{{=prefix}}img/home_gears.png" />
+    </div>
+    <h2>Security Engine</h2>
+    <p>We run the polls/elections online in an anonymous and verifiable manner using the latest security technologies.
+      <a href="{{=URL('features')}}">Learn more&nbsp;&raquo;</a>
+    </p>
+                </div>
+  <div class="span3">
+    <div class="image-wrapper">
+      <img alt="" src="{{=prefix}}img/home_arrow.png" />
+    </div>
+    <h2>Email Notifications</h2>
+    <p>Voting links, reminders, receipts, and notifications are sent by emails. 
+      <a href="{{=URL('features')}}">Learn more&nbsp;&raquo;</a>
+    </p>
+  </div>
+  <div class="span3">
+    <div class="image-wrapper">
+      <img alt="" src="{{=prefix}}img/home_arrows.png" />
+    </div>
+    <h2>Quick Interaction</h2>
+    <p>One click actions make the voting process simple without need to create accounts or navigate multiple pages.
+      <a href="{{=URL('features')}}">Learn more&nbsp;&raquo;</a>
+    </p>
+  </div>
+</div>

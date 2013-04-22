@@ -5,15 +5,17 @@ response.files.append(URL('static','cleditor/jquery.cleditor.table.min.js'))
 }}
 {{extend 'layout.html'}}
 
+<h1>Create/Edit Election</h1>
+
 {{=form.custom.begin}}
-<table>
+<table width="100%">
   <tr>
     <td colspan="2">{{=form.custom.widget.title}}</td>
   </tr>
   <tr>
     <td colspan="2">
       <h3>{{=T('Ballot')}}</h3>
-      <p>{{=T('This is the text of the ballot. %s %s %s ..., add INPUT radio boxes. Radio boxes with the same number are exclusive.') % ('{'*2+'0'+'}'*2,
+      <p>{{=T('This is the text of the ballot. %s %s %s ..., add INPUT radio boxes. Radio boxes with the same number correspond to exclusive options.') % ('{'*2+'0'+'}'*2,
 '{'*2+'1'+'}'*2,'{'*2+'2'+'}'*2)}}</p>
       {{=form.custom.widget.ballot_model}}
     </td>
@@ -27,31 +29,31 @@ response.files.append(URL('static','cleditor/jquery.cleditor.table.min.js'))
       {{=form.custom.widget.managers}}</td>
   </tr>
   <tr>
-    <td colspan="2"><h3>{{=T('Deadline')}}</h3>
-      <p>{{=T('Results will be public after the deadline')}}</p>
+    <td colspan="1"><h3>{{=T('Deadline')}}</h3>
+      <p>{{=T('Results will be public after the deadline (UTC/GMT time)')}}</p>
       {{=form.custom.widget.deadline}}</td>
-  </tr>
-  <tr>
-    <td colspan="2">
-      <a href="#" onclick="jQuery('.advanced').slideToggle();return false;">
-	{{=T('more')}}
+    <td colspan="1">
+      <a href="#" class="btn" onclick="jQuery('.advanced').slideToggle();return false;">
+	{{=T('more options')}}
       </a>
     </td>
   </tr>
+</table>
+<table class="advanced" width="100%">
   <tr>
-    <td class="hidden advanced" colspan="2"><h3>{{=T('Text of email with voting link')}}</h3>
+    <td colspan="2"><h3>{{=T('Text of email with voting link')}}</h3>
       {{=form.custom.widget.vote_email}}</td>
   </tr>
   <tr>
-    <td class="hidden advanced" colspan="2"><h3>{{=T('Text of email for voting receipt')}}</h3>
+    <td colspan="2"><h3>{{=T('Text of email for voting receipt')}}</h3>
       {{=form.custom.widget.voted_email}}</td>
   </tr>
   <tr>
-    <td class="hidden advanced" colspan="2"><h3>{{=T('Text of email for non-voters')}}</h3>
+    <td colspan="2"><h3>{{=T('Text of email for non-voters')}}</h3>
       {{=form.custom.widget.not_voted_email}}</td>
   </tr>
   <tr>
-    <td class="hidden advanced" colspan="2"><h3>{{=T('Email sender')}}</h3>
+    <td colspan="2"><h3>{{=T('Email sender')}}</h3>
       {{=form.custom.widget.email_sender}}</td>
   </tr>
   {{if form.custom.deletable:}}
@@ -59,17 +61,18 @@ response.files.append(URL('static','cleditor/jquery.cleditor.table.min.js'))
     <td colspan="2"><h3>{{=T('Delete?')}} {{=form.custom.deletable}}</h3></td>
   </tr>
   {{pass}}  
-  <tr>
-    <td colspan="2">{{=form.custom.submit}}</td>
-  </tr>
 </table>
+{{=form.custom.submit}}
 {{=form.custom.end}}
+
 
 <script type="text/javascript">
 jQuery(function() {
   jQuery("#election_ballot_model").cleditor({width: '100%'})[0].focus();
   jQuery("#election_voters").css({width:'300px'});
   jQuery("#election_managers").css({width:'300px'});
+  jQuery(".advanced").hide();
+  jQuery("input[type=submit]").addClass('btn btn-primary');
 });
 </script>
 

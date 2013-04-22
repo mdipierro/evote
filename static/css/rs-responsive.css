@@ -1,0 +1,335 @@
+/*----------------------------------------------------------------------------- 
+
+REVOLUTION RESPONSIVE BASIC STYLES OF HTML DOCUMENT
+
+Screen Stylesheet 
+
+version:   	1.0 
+date:      	26/06/12 
+author:		themepunch
+email:     	support@themepunch.com 
+website:   	http://www.themepunch.com
+-----------------------------------------------------------------------------*/
+
+
+
+/*********************************************************************************************
+              -	SET THE SCREEN SIZES FOR THE BANNER IF YOU WISH TO MAKE THE BANNER RESOPONSIVE 	-	
+**********************************************************************************************/
+
+/*	-	THE BANNER CONTAINER (Padding, Shadow, Border etc. )	-	*/
+
+.fullwidthbanner-container, .fullwidthbanner-container2 {	
+    margin: 0 0 40px 0;
+    background-color:#fff;
+    height:auto;
+    position:relative;
+    position:relative;	
+    margin-left:auto;
+    margin-right:auto;	
+
+}
+.fullwidthbanner-container {
+    width:100% !important;
+    position:relative;
+    padding:0;
+    max-height:450px !important;
+    overflow:hidden;
+    margin-bottom: 50px;
+}
+.banner {		
+    height:400px;
+    position:relative;
+    overflow:hidden;			
+}
+.banner2 {		
+    width:100%;
+    height:298px;
+    position:relative;
+    overflow:hidden;			
+}
+
+.fullwidthbanner-container .middle {
+    font-size: 16px;
+}
+.fullwidthbanner-container .big {
+    font-size: 32px;
+    line-height: 35px;
+    padding-left: 10px;
+}
+.fullwidthbanner-container .small {
+    font-size: 12px;
+    line-height: 17px;
+}
+.fullwidthbanner-container2 .middle {
+    font-size: 16px;
+}
+.fullwidthbanner-container2 .big {
+    font-size: 32px;
+    line-height: 35px;
+}
+.fullwidthbanner-container2 .small {
+    font-size: 12px;
+    line-height: 17px;
+}
+.fullwidthbanner-container .slide1 .small {
+        padding-right: 20px;
+    }
+.fullwidthbanner-container .slide3 .small {
+        padding-right: 20px;
+    }
+    .fullwidthbanner-container .big {
+        position: absolute;
+        padding-right: 10px;
+    }
+    .fullwidthbanner-container .slide4 .small {
+        padding-right: 100px;
+    }
+    .fullwidthbanner-container .slide1 .large {
+        font-size: 30px;
+        font-weight: 900;
+        line-height: 1.5;
+        color: #ffffff;
+    }
+    .fullwidthbanner-container .slide1 .medium {
+        font-size: 15px;
+        line-height: 2;
+        color: #ffffff;
+    }
+    .fullwidthbanner-container .slide3 .large {
+        font-size: 30px;
+        font-weight: 900;
+        line-height: 1.5;
+        color: #ffffff;
+    }
+    .fullwidthbanner-container .slide3 .medium {
+        font-size: 15px;
+        line-height: 2;
+        color: #ffffff;
+    }
+    .fullwidthbanner-container .slide2 .large {
+        font-size: 30px;
+        font-weight: 900;
+        line-height: 1.5;
+        color: #ffffff;
+    }
+    .fullwidthbanner-container .slide2 .medium {
+        font-size: 15px;
+        line-height: 1.666;
+        color: #ffffff;
+        padding-bottom: 0;
+    }
+    .fullwidthbanner-container .slide2 .medium img {
+        margin-top: -4px;
+    }
+
+/*	THE MEDIA CHOOSER TO SET DIFFERENT SIZES OF THE CONTAINER DEPENDING ON THE SCREEN SIZE    */
+@media only screen and (min-width: 768px) and (max-width: 959px) {		
+
+    .banner, .fullwidthbanner-container			{	width:724px; height:auto;	}
+    .fullwidthbanner-container .middle {
+        font-size: 20px;
+    }
+    .fullwidthbanner-container .big {
+        font-size: 30px;
+        line-height: 39px;
+    }
+    .fullwidthbanner-container .small {
+        font-size: 13px;
+        line-height: 20px;
+    }
+    .fullwidthbanner-container .caption  {
+        padding-right: 0;
+    }
+    .fullwidthbanner-container .slide2 .small {
+        margin-left: -158px;
+        padding-right: 103px;
+    }    
+    .fullwidthbanner-container .big {
+        position: absolute;
+        padding-right: 10px;
+    }
+    .fullwidthbanner-container .slide2 .small {
+        background-color: #333333;
+        color: #FFFFFF;
+        padding-left: 20px;
+    }
+    .fullwidthbanner-container .slide4 .small {
+        padding: 6px 100px 0 0;
+    }
+    .fullwidthbanner-container .slide4 .middle {
+        line-height: 11px;
+    }
+    .stick1, .stick3, .stick4, .stick5, .stick6 {
+        display: none;
+    }
+    .stick2 img {
+        width: 152px;
+        height: 150px;
+    }
+    .fullwidthbanner-container .slide1 .large {
+        font-size: 20px;
+        line-height: 1.666;
+    }
+    .fullwidthbanner-container .slide1 .medium {
+        font-size: 13px;
+        line-height: 1.666;
+    }
+    .fullwidthbanner-container .slide2 .large {
+        font-size: 20px;
+        line-height: 1.666;
+    }
+    .fullwidthbanner-container .slide2 .medium {
+        font-size: 13px;
+        line-height: 1.666;
+    }
+    .fullwidthbanner-container .slide3 .large {
+        font-size: 20px;
+        line-height: 1.666;
+    }
+    .fullwidthbanner-container .slide3 .medium {
+        font-size: 13px;
+        line-height: 1.666;
+    }
+}
+
+@media only screen and (min-width: 480px) and (max-width: 767px) {
+
+    .banner, .fullwidthbanner-container		{	width:auto; height:auto;	}	
+    .fullwidthbanner-container .middle {
+        font-size: 12px;
+    }
+    .fullwidthbanner-container .big {
+        font-size: 20px;
+        line-height: 25px;
+    }
+    .fullwidthbanner-container .small {
+        font-size: 12px;
+        line-height: 14px;
+        padding-right: 10px;
+    }
+    .fullwidthbanner-container .caption  {
+        padding-right: 0;
+    }
+    .fullwidthbanner-container .slide2 .small {
+        background-color: #333333;
+        color: #FFFFFF;
+        margin-left: -258px;
+        padding-left: 20px;
+        padding-right: 203px;
+        padding-top: 11px;
+    }
+    .fullwidthbanner-container .big {
+        position: absolute;
+        padding-right: 10px;
+    }
+    .stick1, .stick3, .stick4, .stick5, .stick6 {
+        display: none;
+    }
+    .stick2 img {
+        width: 152px;
+        height: 150px;
+    }
+    .fullwidthbanner-container .slide4 .small {        
+        padding: 6px 0 0;
+    }
+    .fullwidthbanner-container .slide4 .middle {
+        line-height: 11px;
+    }
+    .fullwidthbanner-container .small {
+        display: none;
+    }
+    .fullwidthbanner-container .slide1 .large {
+        font-size: 16px;
+        line-height: 1.333;
+    }
+    .fullwidthbanner-container .slide1 .medium {
+        font-size: 12px;
+        line-height: 1.333;
+    }
+    .fullwidthbanner-container .slide2 .large {
+        font-size: 16px;
+        line-height: 1.333;
+    }
+    .fullwidthbanner-container .slide2 .medium {
+        font-size: 12px;
+        line-height: 1.333;
+    }
+    .fullwidthbanner-container .slide3 .large {
+        font-size: 16px;
+        line-height: 1.333;
+    }
+    .fullwidthbanner-container .slide3 .medium {
+        font-size: 12px;
+        line-height: 1.333;
+    }
+}
+
+@media only screen and (min-width: 0px) and (max-width: 479px) {
+
+    .banner, .fullwidthbanner-container		{	width:auto; height:auto;	}
+    .fullwidthbanner-container .middle {
+        font-size: 10px;
+        line-height: 15px;
+        display: none;
+    }
+    .fullwidthbanner-container .big {
+        font-size: 10px;
+        line-height: 11px;     
+    }
+    .fullwidthbanner-container .small {
+        padding-right: 10px;
+        font-size: 8px;
+        line-height: 10px;
+        display: none;
+    }
+    .fullwidthbanner-container .caption  {
+        padding-right: 0;
+    }
+    .fullwidthbanner-container .big {
+        position: absolute;
+        padding-right: 10px;
+    }
+    .stick1, .stick3, .stick4, .stick5, .stick6 {
+        display: none;
+    }
+    .stick2 img {
+        width: 152px;
+        height: 150px;
+    }
+    .fullwidthbanner-container .slide4 .small {
+        padding: 6px 0 0;
+    }
+    .fullwidthbanner-container .slide4 .middle {
+        line-height: 11px;
+    }
+    .fullwidthbanner-container .slide1 .large {
+        font-size: 12px;
+        line-height: 1.333;
+    }
+    .fullwidthbanner-container .slide1 .medium {
+        font-size: 8px;
+        line-height: 1.333;
+    }
+    .fullwidthbanner-container .slide2 .large {
+        font-size: 12px;
+        line-height: 1.333;
+    }
+    .fullwidthbanner-container .slide2 .medium {
+        display: none;
+    }
+    .fullwidthbanner-container .slide3 .large {
+        font-size: 12px;
+        line-height: 1.333;
+    }
+    .fullwidthbanner-container .slide3 .medium {
+        font-size: 8px;
+        line-height: 1.333;
+    }
+}
+
+
+
+
+
+

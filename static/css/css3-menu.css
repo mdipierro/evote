@@ -1,0 +1,311 @@
+/* css3 menu */
+ul#css3-menu{
+	width: 940px;
+	min-width: 940px;
+	margin: 0 auto;
+	list-style: none;
+	font-family: 'Open Sans', Arial, "MS Trebuchet", sans-serif;
+	height: 46px;
+	padding: 0;
+}
+
+ul#css3-menu > li{
+	display: block;
+	float: left;
+	-webkit-transition: background .4s linear;
+	-moz-transition: background .4s linear;
+	-ms-transition: background .4s linear;
+	-o-transition: background .4s linear;
+	transition: background .4s linear;
+	
+	<!--[if IE]>
+	position: relative;
+	<![endif]-->
+}
+
+ul#css3-menu > li:first-child{
+	border-left: none !important;
+	-webkit-border-top-left-radius: 4px;
+	-webkit-border-bottom-left-radius: 4px;
+	
+	-moz-border-radius-topleft: 4px;
+	-moz-border-radius-bottomleft: 4px;
+	
+	-ms-border-top-left-radius: 4px;
+	-ms-border-bottom-left-radius: 4px;
+	
+	-o-border-top-left-radius: 4px;
+	-o-border-bottom-left-radius: 4px;
+	
+	border-top-left-radius: 4px;
+	border-bottom-left-radius: 4px;
+}
+
+ul#css3-menu > li:last-child{
+	border-right: none !important;
+}
+
+
+ul#css3-menu > li > a{
+	display: block;
+	padding: 15px 30px;
+	color: white;
+	text-decoration: none;
+	font-weight: 600;
+        font-weight: bold;
+}
+
+/*
+ul#css3-menu > li:hover > div{
+	-webkit-transform: translateY(-80px);
+	-moz-transform: translateY(-80px);
+	-ms-transform: translateY(-80px);
+	-o-transform: translateY(-80px);
+	transform: translateY(-80px);
+	
+}
+*/
+/*visibility: visible;*/
+
+ul#css3-menu > li > div{
+	-webkit-transition: -webkit-transform .2s linear;
+	-moz-transition: -moz-transform .2s linear;
+	-ms-transition: -ms-transform .2s linear;
+	-o-transition: -o-transform .2s linear;
+	transition: transform .2s linear;
+	text-align: center;
+	margin: 0 auto;
+	-webkit-transform: translateY(-60px);
+	-moz-transform: translateY(-60px);
+	-ms-transform: translateY(-60px);
+	-o-transform: translateY(-60px);
+	transform: translateY(-60px);
+	width: 37px;
+	height: 37px;
+	/*visibility: hidden;*/
+	margin-bottom: -37px;
+	z-index: -1;
+	
+	<!--[if IE]>
+	margin-top: -60px;
+	<![endif]-->
+	
+}
+
+ul#css3-menu > li > div{
+	background: url(../img/icons-dark.png) 0 0 no-repeat;
+}
+
+ul#css3-menu.blue > li > div{
+	background: url(../img/icons-blue.png) 0 0 no-repeat;
+}
+
+ul#css3-menu.green > li > div{
+	background: url(../img/icons-green.png) 0 0 no-repeat;
+}
+
+ul#css3-menu.red > li > div{
+	background: url(../img/icons-red.png) 0 0 no-repeat;
+}
+
+
+
+
+
+
+
+
+
+/* icons */
+ul#css3-menu > li > div.cloud{ background-position: -28px -27px; }
+ul#css3-menu > li > div.lock{ background-position: -92px -27px; }
+ul#css3-menu > li > div.inbox{ background-position: -156px -27px; }
+ul#css3-menu > li > div.chat{ background-position: -220px -27px; }
+ul#css3-menu > li > div.microphone{ background-position: -286px -27px; }
+ul#css3-menu > li > div.email{ background-position: -348px -27px; }
+ul#css3-menu > li > div.briefcase{ background-position: -412px -27px; }
+ul#css3-menu > li > div.trolley{ background-position: -477px -27px; }
+ul#css3-menu > li > div.clock{ background-position: -540px -27px; }
+ul#css3-menu > li > div.user{ background-position: -605px -27px; }
+ul#css3-menu > li > div.settings{ background-position: -668px -27px; }
+ul#css3-menu > li > div.music{ background-position: -734px -27px; }
+
+ul#css3-menu > li > div.twitter{ background-position: -28px -92px; }
+ul#css3-menu > li > div.pencil{ background-position: -92px -92px; }
+ul#css3-menu > li > div.frame{ background-position: -156px -92px; }
+ul#css3-menu > li > div.star{ background-position: -220px -92px; }
+ul#css3-menu > li > div.key{ background-position: -286px -92px; }
+ul#css3-menu > li > div.chart{ background-position: -348px -92px; }
+ul#css3-menu > li > div.apple{ background-position: -412px -92px; }
+ul#css3-menu > li > div.file{ background-position: -477px -92px; }
+ul#css3-menu > li > div.image{ background-position: -540px -92px; }
+ul#css3-menu > li > div.folder{ background-position: -605px -92px; }
+ul#css3-menu > li > div.camera{ background-position: -668px -92px; }
+ul#css3-menu > li > div.search{ background-position: -734px -92px; }
+
+ul#css3-menu > li > div.dribbble{ background-position: -28px -155px; }
+ul#css3-menu > li > div.rss{ background-position: -92px -155px; }
+ul#css3-menu > li > div.target{ background-position: -156px -155px; }
+ul#css3-menu > li > div.debug{ background-position: -220px -155px; }
+ul#css3-menu > li > div.terminal{ background-position: -283px -155px; }
+ul#css3-menu > li > div.movie{ background-position: -348px -155px; }
+ul#css3-menu > li > div.home{ background-position: -412px -155px; }
+ul#css3-menu > li > div.globe{ background-position: -477px -155px; }
+ul#css3-menu > li > div.pin{ background-position: -540px -155px; }
+ul#css3-menu > li > div.info{ background-position: -605px -155px; }
+ul#css3-menu > li > div.eye{ background-position: -668px -155px; }
+ul#css3-menu > li > div.heart{ background-position: -734px -155px; }
+
+ul#css3-menu > li > div.calendar{ background-position: -28px -218px; }
+ul#css3-menu > li > div.monitor{ background-position: -92px -218px; }
+ul#css3-menu > li > div.iphone{ background-position: -156px -218px; }
+ul#css3-menu > li > div.drop{ background-position: -220px -218px; }
+ul#css3-menu > li > div.location{ background-position: -286px -218px; }
+ul#css3-menu > li > div.tag{ background-position: -348px -218px; }
+ul#css3-menu > li > div.old-phone{ background-position: -412px -218px; }
+ul#css3-menu > li > div.headphones{ background-position: -477px -218px; }
+ul#css3-menu > li > div.skype{ background-position: -540px -218px; }
+ul#css3-menu > li > div.gift{ background-position: -605px -218px; }
+ul#css3-menu > li > div.cone{ background-position: -668px -218px; }
+ul#css3-menu > li > div.settings{ background-position: -734px -218px; }
+
+ul#css3-menu > li > div.tick{ background-position: -28px -282px; }
+ul#css3-menu > li > div.bell{ background-position: -92px -282px; }
+ul#css3-menu > li > div.coffee{ background-position: -156px -282px; }
+ul#css3-menu > li > div.basket{ background-position: -220px -282px; }
+ul#css3-menu > li > div.flag{ background-position: -286px -282px; }
+ul#css3-menu > li > div.ipod{ background-position: -348px -282px; }
+ul#css3-menu > li > div.trash{ background-position: -412px -282px; }
+ul#css3-menu > li > div.compass{ background-position: -477px -282px; }
+ul#css3-menu > li > div.typography{ background-position: -540px -282px; }
+ul#css3-menu > li > div.keynote{ background-position: -605px -282px; }
+ul#css3-menu > li > div.target-1{ background-position: -668px -282px; }
+ul#css3-menu > li > div.crop{ background-position: -734px -282px; }
+
+ul#css3-menu > li > div.wallet{ background-position: -28px -346px; }
+ul#css3-menu > li > div.contact{ background-position: -92px -346px; }
+ul#css3-menu > li > div.bookmark{ background-position: -156px -346px; }
+ul#css3-menu > li > div.camcorder{ background-position: -220px -346px; }
+ul#css3-menu > li > div.database{ background-position: -286px -346px; }
+ul#css3-menu > li > div.card{ background-position: -350px -346px; }
+ul#css3-menu > li > div.button{ background-position: -413px -346px; }
+ul#css3-menu > li > div.neutron{ background-position: -477px -346px; }
+ul#css3-menu > li > div.windows{ background-position: -540px -346px; }
+ul#css3-menu > li > div.battery{ background-position: -605px -346px; }
+ul#css3-menu > li > div.code{ background-position: -668px -346px; }
+ul#css3-menu > li > div.music{ background-position: -734px -346px; }
+
+
+
+
+
+
+
+
+
+/* dark theme */
+ul#css3-menu.dark{
+	background: #444;
+	-webkit-box-shadow: inset 0 0 8px #222;
+	-moz-box-shadow: inset 0 0 8px #222;
+	-ms-box-shadow: inset 0 0 8px #222;
+	-o-box-shadow: inset 0 0 8px #222;
+	box-shadow: inset 0 0 8px #222;
+}
+
+ul#css3-menu.dark > li{
+	border-right: 1px #333 solid;
+	border-left: 1px #555 solid;
+}
+
+ul#css3-menu.dark > li:hover{
+	background: #222;
+}
+
+
+
+
+
+
+
+
+
+/* blue theme */
+.navbar-wrapper {
+    background: #2773AE;
+	background-color:#2773AE; filter: progid:DXImageTransform.Microsoft.dropShadow(color=#2773AE, offX=0, offY=0, positive=true);  
+    box-shadow: 0 -10px 8px -10px #074979 inset, 0 10px 8px -10px #074979 inset; 
+    -webkit-box-shadow: 0 -10px 8px -10px #074979 inset, 0 10px 8px -10px #074979 inset; 
+    -moz-box-shadow: 0 -10px 8px -10px #074979 inset, 0 10px 8px -10px #074979 inset;
+}
+ul#css3-menu.blue{
+	background: #2773AE;
+	background-color:#2773AE; filter: progid:DXImageTransform.Microsoft.dropShadow(color=#2773AE, offX=0, offY=0, positive=true);  
+    box-shadow: 0 -10px 8px -10px #074979 inset, 0 10px 8px -10px #074979 inset; 
+    -webkit-box-shadow: 0 -10px 8px -10px #074979 inset, 0 10px 8px -10px #074979 inset; 
+    -moz-box-shadow: 0 -10px 8px -10px #074979 inset, 0 10px 8px -10px #074979 inset;  
+}
+
+ul#css3-menu.blue > li{
+	border-right: 1px #074979 solid;
+	border-left: 1px #3e92d0 solid;
+        height: 46px;
+}
+
+ul#css3-menu.blue > li:hover{
+	background: #074979;
+}
+
+
+
+
+
+
+
+
+
+/* green theme */
+ul#css3-menu.green{
+	background: #4BA155;
+	-webkit-box-shadow: inset 0 0 8px #2e7336;
+	-moz-box-shadow: inset 0 0 8px #2e7336;
+	-ms-box-shadow: inset 0 0 8px #2e7336;
+	-o-box-shadow: inset 0 0 8px #2e7336;
+	box-shadow: inset 0 0 8px #2e7336;
+}
+
+ul#css3-menu.green > li{
+	border-right: 1px #2e7336 solid;
+	border-left: 1px #7bcd85 solid;
+}
+
+ul#css3-menu.green > li:hover{
+	background: #2e7336;
+}
+
+
+
+
+
+
+
+
+
+/* red theme */
+ul#css3-menu.red{
+	background: #CB2F32;
+	-webkit-box-shadow: inset 0 0 8px #a81f22;
+	-moz-box-shadow: inset 0 0 8px #a81f22;
+	-ms-box-shadow: inset 0 0 8px #a81f22;
+	-o-box-shadow: inset 0 0 8px #a81f22;
+	box-shadow: inset 0 0 8px #a81f22;
+}
+
+ul#css3-menu.red > li{
+	border-right: 1px #a81f22 solid;
+	border-left: 1px #de6062 solid;
+}
+
+ul#css3-menu.red > li:hover{
+	background: #a81f22;
+}

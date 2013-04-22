@@ -1,21 +1,17 @@
 {{extend 'layout.html'}}
 
-<table>
-  <tr>
-    <th>{{=T('Total Ballots/Voters:')}}</th><td>{{=len(ballots)}}</td>
-  </tr>
-  <tr>
-    <th>{{=T('Used Ballots/Votes:')}}</th><td>{{=len([t for t in ballots if not t.voted_on is None])}}</td>
-  </tr>
-</table>
+<h2>Ballots for election #{{=election.id}} "{{=election.title}}" </h2>
 
 <p>{{=T('Ballots are generated when the election starts and ballot-ids are assigned to voters when their vote is cast. The enumerated collection of ballots will not change unless the election has been tampered with. The ballot UUID is comprised of an actual UUID and an RSA signature of the UUID using the election private_key.')}}</p>
+
+<h3>{{=T('Total Ballots/Voters:')}} {{=len(ballots)}}
+{{=T('Used Ballots/Votes:')}} {{=len([t for t in ballots if not t.voted_on is None])}}</h3>
 
 {{if tampered:}}
 <div style="width:100%; background-color:red; color:white; padding:20px; text-align:center">Ballot text has been edited during the election</div>
 {{pass}}
 
-<table>
+<table class="table">
   <tr>
     <th>{{=T('Ballot Id')}}</th>
     <th>{{=T('Voted On (UTC/GMT)')}}</th>
@@ -23,7 +19,7 @@
   {{for ballot in ballots:}}
   <tr>
     <td>
-      {{=A(ballot.ballot_uuid,_href=URL('ballot',args=ballot.ballot_uuid))}}
+      {{=A(ballot.ballot_uuid,_href=URL('ballot',args=ballot.ballot_uuid),_class="btn btn-small")}}
     </td>
     <td>
       {{=ballot.voted_on or T('BLANK')}}
