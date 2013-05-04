@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 request.now = request.utcnow
 
+# require an HTTP session
+if SCHEME == 'https': session.secure()
+
 # connect to database
 db = DAL(DBURI)
 

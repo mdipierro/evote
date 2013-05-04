@@ -9,7 +9,7 @@ db.define_table(
     Field('deadline','datetime'),
     Field('vote_email','text'),
     Field('voted_email','text'),
-    Field('email_sender',requires=IS_EMAIL(),default='i.vote.secure@gmail.com'),
+    Field('email_sender',requires=IS_EMAIL(),default=EMAIL_SENDER,writable=False),
     Field('not_voted_email','text'),
     Field('public_key',writable=False,readable=False),                
     Field('private_key',writable=False,readable=False),                
