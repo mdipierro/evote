@@ -1,16 +1,11 @@
-﻿/**
- @preserve CLEditor Table Plugin v1.0.2
+﻿/*!
+ CLEditor Table Plugin v1.0.3
  http://premiumsoftware.net/cleditor
  requires CLEditor v1.2.2 or later
  
  Copyright 2010, Chris Landowski, Premium Software, LLC
  Dual licensed under the MIT or GPL Version 2 licenses.
 */
-
-// ==ClosureCompiler==
-// @compilation_level SIMPLE_OPTIMIZATIONS
-// @output_file_name jquery.cleditor.table.min.js
-// ==/ClosureCompiler==
 
 (function($) {
 
@@ -23,9 +18,9 @@
     popupName: "table",
     popupClass: "cleditorPrompt",
     popupContent:         
-      "<table cellpadding=0 cellspacing=0><tr>" +
-      "<td>Cols:<br><input type=text value=4 size=6></td>" +
-      "<td>Rows:<br><input type=text value=4 size=6></td>" +
+      "<table cellpadding=4 cellspacing=0><tr>" +
+      "<td>Cols:<br><input type=text value=4 style='width:40px'></td>" +
+      "<td>Rows:<br><input type=text value=4 style='width:40px'></td>" +
       "</tr></table><input type=button value=Submit>",
     buttonClick: tableButtonClick
   };
