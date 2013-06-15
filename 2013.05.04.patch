@@ -1,0 +1,27 @@
+diff --git a/models/db.py b/models/db.py
+index 4fb75b6..00b5ae8 100644
+--- a/models/db.py
++++ b/models/db.py
+@@ -1,6 +1,9 @@
+ # -*- coding: utf-8 -*-
+ request.now = request.utcnow
+ 
++# require an HTTP session
++if SCHEME == 'https': session.secure()
++
+ # connect to database
+ db = DAL(DBURI)
+ 
+diff --git a/models/db_votes.py b/models/db_votes.py
+index dc13b6c..c6e9007 100644
+--- a/models/db_votes.py
++++ b/models/db_votes.py
+@@ -9,7 +9,7 @@ db.define_table(
+     Field('deadline','datetime'),
+     Field('vote_email','text'),
+     Field('voted_email','text'),
+-    Field('email_sender',requires=IS_EMAIL(),default='i.vote.secure@gmail.com'),
++    Field('email_sender',requires=IS_EMAIL(),default=EMAIL_SENDER,writable=False),
+     Field('not_voted_email','text'),
+     Field('public_key',writable=False,readable=False),                
+     Field('private_key',writable=False,readable=False),                

@@ -5,6 +5,8 @@ EMAIL_SENDER = 'i.vote.secure@gmail.com'
 EMAIL_SERVER = 'localhost'
 EMAIL_LOGIN  = None
 GMAIL_LOGIN  = None
+AS_SERVICE = True
+DEBUG_MODE = True
 SCHEME = 'http' or 'https' # scheme for access to voting
 
 response.title = 'E-Vote'

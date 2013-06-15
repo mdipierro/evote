@@ -9,7 +9,7 @@ try:
 except:
     have_ast=False
 
-regex = re.compile('{{(\w+)\!?}}')
+regex_field = re.compile('{{(\w+)(\:\w+)?\!?}}')
 regex_email = re.compile('[\w_\-\.]+\@[\w_\-\.]+')
 
 def uuid():
@@ -31,34 +31,55 @@ def ballot2form(ballot,readonly=False,counters=None,filled=False):
     """ if counters is passed this counts the results in the ballot """    
     radioes = {}    
     if isinstance(counters,dict): readonly=True
-    def radio(item):        
+    def radio(item):     
         name = "ck_"+item.group(1)       
         value = radioes[name] = radioes.get(name,0)+1        
+        if item.group(2):
+            name = name+'-%s-%s' % (item.group(2)[1:], value)
         key = (name,value)
         if isinstance(counters,dict):
             return INPUT(_type='text',_readonly=True,
                          _value=counters.get(key,0),
                          _style="width:3em").xml()
-        if not counters is None and 'x' in item.group().lower():
-            counters[key] = counters.get(key,0)+1            
-        return INPUT(_type='radio',_name=name,_value=value,
-                     _checked=('!' in item.group()),
-                     _disabled=readonly).xml()    
-    body = regex.sub(radio,ballot.replace('\r',''))
+        ### CHECK THIS!
+        #if counters is not None and 'x' in item.group().lower():
+        #    counters[key] = counters.get(key,0)+1
+        ### CHECK THIS!
+        if not item.group(2):
+            return INPUT(_type='radio',_name=name,_value=value,
+                         _checked=('!' in item.group()),
+                         _disabled=readonly).xml()    
+        else:
+            return INPUT(_type='input',_name=name,_value=value,
+                         _checked=('!' in item.group()),
+                         _class='model-'+item.group(2)[1:],
+                         _disabled=readonly,
+                         ).xml()   
+    body = regex_field.sub(radio,ballot.replace('\r',''))
     form = FORM(XML(body),not readonly and INPUT(_type='submit', _value="Submit You Ballot!") or '',_class="ballot")
     if not readonly: form.process(formname="ballot")
     return form
 
 def form2ballot(ballot,token,vars,results):    
     radioes = {}
+    print vars
     def check(item):
         name = 'ck_'+item.group(1)
         value = radioes[name] = radioes.get(name,0)+1
-        checked = vars.get(name,0)==str(value)
-        if isinstance(results,dict): results[(name,value)] = checked
-        return INPUT(_type="radio",_name=name,_value=value,
-                     _disabled=True,_checked=checked).xml()
-    ballot_content = regex.sub(check,ballot.replace('\r',''))
+        if not item.group(2):
+            checked = vars.get(name,0)==str(value)
+            if isinstance(results,dict):
+                results[(name,value)] = checked
+            return INPUT(_type="radio",_name=name,_value=value,
+                         _disabled=True,_checked=checked).xml()
+        else:
+            name2 = name+'-%s-%s' % (item.group(2)[1:], value)
+            rank = vars.get(name2,0)            
+            if isinstance(results,dict):
+                results[(name,value)] = rank
+            return INPUT(_type="input",_name=name2,_value=rank,
+                         _disabled=True).xml()
+    ballot_content = regex_field.sub(check,ballot.replace('\r',''))
     if token: ballot_content += '<pre>\n%s\n</pre>' % token
     return '<div class="ballot">%s</div>' % ballot_content.strip()
 

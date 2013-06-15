@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{prefix = '/%s/static/' % (request.application)}}
+    <!--  SEO STUFF START HERE -->
+    <title>E-Vote Home Page</title>
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <meta name="robots" content="follow, index" />
+    <!--  SEO STUFF END -->
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{=prefix}}css/bootstrap.css" />
+    <link rel="stylesheet" href="{{=prefix}}css/custom.css" />
+    <link rel="stylesheet" href="{{=prefix}}css/css3-menu.css" />
+    <link rel="stylesheet" href="{{=prefix}}css/color_scheme.css" />
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,700,700italic" rel="stylesheet" type="text/css" />
+    <link href='http://fonts.googleapis.com/css?family=Raleway:400,900,500,600,700,800' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="{{=prefix}}css/font-awesome.css" />
+    <link rel="stylesheet" href="{{=prefix}}css/font-awesome-ie7.css" />
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" type="text/css" href="{{=prefix}}css/IE-fix.css" />
+        <![endif]-->
+    {{include 'web2py_ajax.html'}}
+  </head>
+  <body>
+    <!-- FORK ME ON GITHUB -->
+    <a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+    <!-- THE LINE AT THE VERY TOP OF THE PAGE -->
+    <div class="flash">{{=response.flash or ''}}</div>
+    <div class="top_line"></div>
+    <!-- HEADER AREA -->
+    <header>
+      <div class="container">
+        <div class="row">
+          <!-- HEADER: LOGO AREA -->
+          <div class="span4 logo">
+            <a class="logo" href="index.html">
+              <img alt="logo" title="ReDesign" src="{{=prefix}}img/logo.png">
+            </a>
+          </div>
+        </div>
+      </div>            
+    </header>
+    <!-- PRIMARY SITE NAVIGATION -->
+    <div class="navbar-wrapper">
+      <div class="container">
+        <div class="navbar">
+          <div class="navbar-inner">
+            <div class="buttons-container">
+            </div>
+	    
+            <ul class="blue nav" id="css3-menu">
+              <li>
+                <a href="{{=URL('index')}}">Home Page</a>
+              </li>
+              <li>
+                <a href="{{=URL('edit')}}">New Election</a>
+              </li>
+              <li>
+                <a href="{{=URL('elections')}}">My Elections</a>
+              </li>
+              <li>
+                <a href="{{=URL('features')}}">Features</a>
+              </li>
+              <li>
+                <a href="{{=URL('support')}}">Support</a>
+              </li>
+              <li>
+                <a href="{{=URL('contactus')}}">Contact Us</a>
+              </li>                              
+	      {{if auth.user:}}
+	      <li>
+                <a href="{{=URL('user/logout')}}">Sign Out</a>
+              </li>
+	      {{else:}}
+	      <li>
+                <a href="{{=URL('user/login')}}">Sign In</a>
+              </li>
+	      {{pass}}
+
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- MAIN CONTENT AREA -->
+    <div class="main-wrapper" style="margin-top: 50px">
+      <div class="main-content">
+        <div class="container">
+          
+          <!-- FREE TRIAL PROMO BOX -->
+	  {{if request.function=='index':}}
+          <div class="hero-unit dark-hero">
+	    {{if not auth.user:}}
+            <h1><span>Sign-in</span> for <span>Free</span> to run your Election</h1>
+            <ul class="unstyled">
+              <li>Easy, no-hassle sign-in using Google</li>
+              <li>|</li>
+              <li>Free (unless you require data backup)</li>
+              <li>|</li>
+              <li>We are in beta so <a>read our agreement</a></li>
+            </ul>
+            <a class="btn btn-large btn-primary" href="{{=URL('user/login')}}">Sign In</a>	    
+	    {{else:}}
+	    <h1>You are signed in as <span>{{=auth.user.first_name}} {{=auth.user.last_name}}</span>
+            <a class="btn btn-large btn-primary" href="{{=URL('elections')}}">Your Elections</a>	    
+	    {{pass}}
+          </div>
+	  {{pass}}
+	  
+	  
+          <div class="row main-block">
+            <div class="span12">
+              <!-- MAIN CONTENT AREA: REDESIGN CUSTOM - HERO LIST -->
+	      {{include}}	      
+            </div>
+          </div>
+        </div>
+	
+	  
+        <!-- FOOTER STARTS HERE -->
+        <footer id="footer">
+          <div class="footer-top"></div>
+          <div class="footer-wrapper">
+            <div class="container">
+              <div class="row show-grid">
+                <div class="span12">
+                  <div class="row show-grid">
+                    <!-- FOOTER: LOGO -->
+                    <div class="span4">
+                      <h4 class="center-title">Contact Info</h4>
+                      <!--img alt="" class="footer-logo" src="img/grey_logo.png" /-->
+                      <!-- FOOTER: ADDRESS -->
+                      <address class="address">
+                        <p><i class="icon-map-marker icon-large"></i>MetaCryption LLC</p>
+                        <p><i>&nbsp;</i>1144 W Washington Blvd</p>
+                        <p><i>&nbsp;</i>Chicago, IL 60607</p>
+                        <p><i class="icon-phone icon-large"></i>Phone: (312) 243-2501</p>
+			<p><i class="icon-email icon-large"></i>Email: <a href="mailto:metacryption@gmail.com">metacryption@gmail.com</a></p>
+                      </address>
+                    </div>
+                    <!-- FOOTER: ABOUT US -->
+                    <div class="span4 footer-center">
+                      <h4 class="center-title">About Us</h4>
+                      <p>E-Vote is a software as a service platform for online voting. Elections managed using E-Vote as anonymous, and verifiable. The system allows voters to check that their vote has been correctly recorded and counted. It prevents managers and system administrators from tampering with the system. It allow observers to independntly recount the election.</p>
+                      <p></p>
+                    </div>
+                    <!-- FOOTER: NAVIGATION LINKS -->
+                    <div class="span4 footer-right">
+                      <h4 class="center-title">Navigate</h4>
+                      <ul class="footer-navigate">
+                        <li>
+                          <a href="{{=URL('index')}}">Home</a>
+                        </li>
+                        <li>
+                          <a href="{{=URL('elections')}}">My Elections</a>
+                        </li>
+                        <li>
+                          <a href="{{=URL('features')}}">Features</a>
+                        </li>
+                        <li>
+                          <a href="{{=URL('support')}}">Support</a>
+                        </li>
+                        <li>
+                          <a href="http://www.experts4solutions.com">Contact</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="footer-bottom">
+            <div class="container">
+              <div class="row show-grid">
+                <!-- FOOTER: COPYRIGHT TEXT -->
+                <div class="span12">
+                  <p>Powered by <a href="http://www.web2py.com">web2py</a>, <a href="http://wiki.nginx.org/Main">nGinx</a>, <a href="http://www.ubuntu.com/">Ubuntu</a> - Running on <a href="http://vps.net">VPS.net</a> - design by <a href="http://www.themeleaf.com">Themeleaf</a></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+      <!-- END FOOTER -->
+      <!-- Placed at the end of the document so the pages load faster -->
+      <script type="text/javascript" src="{{=prefix}}js/bootstrap.js"></script>
+      <script>
+	jQuery('input[type=submit]').addClass('btn btn-primary');
+	jQuery('input[type=button]').addClass('btn');
+      </script>
+  </body>
+</html>

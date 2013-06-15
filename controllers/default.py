@@ -1,5 +1,3 @@
-debug_mode = False
-
 from ballot import ballot2form, form2ballot, blank_ballot, \
     sign, uuid, regex_email, unpack_results, rsakeys, \
     pack_counters, unpack_counters
@@ -17,7 +15,7 @@ def elections():
         (db.election.deadline==None)|(db.election.deadline>request.now)).select()
     return dict(elections=elections,ballots=ballots)
 
-@auth.requires_login()
+@auth.requires(auth.user and auth.user.is_manager)
 def edit():
     response.subtitle = T('Edit Ballot')
     election = db.election(request.args(0,cast=int,default=0))
@@ -34,14 +32,14 @@ def edit():
     if form.accepted: redirect(URL('start',args=form.vars.id))
     return dict(form=form)
 
-@auth.requires_login()
+@auth.requires(auth.user and auth.user.is_manager)
 def start():    
     election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
     response.subtitle = election.title+T(' / Start')
     demo = ballot2form(election.ballot_model)
     return dict(demo=demo,election=election)
 
-@auth.requires_login()
+@auth.requires(auth.user and auth.user.is_manager)
 def start_callback():
     election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
     form = SQLFORM.factory(
@@ -131,13 +129,13 @@ def self_service():
     return dict(form=form)
                                 
 
-@auth.requires_login()
+@auth.requires(auth.user and auth.user.is_manager)
 def reminders():    
     election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
     response.subtitle = election.title+T(' / Reminders')
     return dict(election=election)
 
-@auth.requires_login()
+@auth.requires(auth.user and auth.user.is_manager)
 def reminders_callback():
     election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
     owner_email = election.created_by.email
@@ -183,7 +181,7 @@ def compute_results(election):
     for ballot in voted_ballots:
         results = unpack_results(ballot.results)
         for key in results:
-            counters[key] = counters.get(key,0) + results[key]
+            counters[key] = counters.get(key,0) + (1 if results[key] else 0)
     election.update_record(counters=pack_counters(counters))
 
 @cache(request.env.path_info,time_expire=300,cache_model=cache.ram)
@@ -218,6 +216,7 @@ def ballots():
                        for b in ballots if b.voted))>1
     return dict(ballots=ballots,election=election, tampered=tampered)
 
+@auth.requires(auth.user and auth.user.is_manager)
 def email_voter_and_managers(election,voter,ballot,message):
     import cStringIO
     attachment = mail.Attachment(
@@ -234,6 +233,7 @@ def email_voter_and_managers(election,voter,ballot,message):
               sender=sender, reply_to=sender)
     return ret
 
+@auth.requires(auth.user and auth.user.is_manager)
 def close_election():
     import zipfile, os
     election = db.election(request.args(0,cast=int)) or \
@@ -311,7 +311,7 @@ def vote():
     voter = db(db.voter.election_id==election_id)\
         (db.voter.voter_uuid==voter_uuid).select().first() or \
         redirect(URL('invalid_link'))
-    if not debug_mode and voter.voted:
+    if not DEBUG_MODE and voter.voted:
         redirect(URL('voted_already'))
     
     if election.deadline and request.now>election.deadline:
@@ -333,7 +333,7 @@ def vote():
             or redirect(URL('no_more_ballots'))
         ballot_content = form2ballot(election.ballot_model,
                                      token=ballot.ballot_uuid,
-                                     vars=request.vars,results=results)        
+                                     vars=request.post_vars,results=results)
         signature = 'signature-'+sign(ballot_content,election.private_key)
         ballot.update_record(results=str(results),
                              ballot_content=ballot_content,
@@ -370,7 +370,7 @@ def not_authorized():
 def no_more_ballots():
     return dict(message=T('Run out of ballots. Your vote was not recorded'))
 
-@auth.requires_login()
+@auth.requires(auth.user and auth.user.is_manager)
 def voters_csv():
     election = db.election(request.args(0,cast=int,default=0),created_by=auth.user.id)
     return db(db.voter.election_id==election.id).select(
@@ -383,4 +383,4 @@ def support():
     return locals()
 
 def contactus():
-    redirect('http://www.experts4solutions.com')
+    return locals()
