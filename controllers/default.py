@@ -2,6 +2,8 @@ from ballot import ballot2form, form2ballot, blank_ballot, \
     sign, uuid, regex_email, unpack_results, rsakeys, \
     pack_counters, unpack_counters
 
+print request.post_vars
+
 def index():
     return dict()
 
