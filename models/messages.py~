@@ -8,9 +8,9 @@ db.election.ballot_model.default = """
 Ranking Election
 
 <ul>
-<li>{{test:ranking}} Candidate A</li>
-<li>{{test:ranking}} Candidate B</li>
-<li>{{test:ranking}} Candidate C</li>
+<li>Candidate A{{test:ranking}}</li>
+<li>Candidate B{{test:ranking}}</li>
+<li>Candidate C{{test:ranking}}</li>
 </ul>
 
 <table>

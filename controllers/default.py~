@@ -183,6 +183,7 @@ def compute_results(election):
     for ballot in voted_ballots:
         results = unpack_results(ballot.results)
         for key in results:
+            print key
             (name,scheme,value) = key
             if scheme == 'checkbox':
                 counters[key] = counters.get(key,0) + (

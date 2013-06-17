@@ -1,5 +1,7 @@
 import random, copy
 
+__all__ = ['makeup_votes','iro','borda', 'schulze']
+
 def makeup_votes(nvotes=100, candidates=['A','B','C','D']):
     """ generate random votes for testing """
     votes = []
@@ -56,6 +58,9 @@ def borda(votes, ignored=set(), mode='linear'):
                     winners[item] = winners.get(item,0) + delta
     winners = [(v,k) for (k,v) in winners.items()]
     winners.sort()
+    if mode == 'exponential':
+        factor = n**(1-n)
+        winners = [(v*factor,k) for (v,k) in winners]
     return winners
 
 def schulze(votes):

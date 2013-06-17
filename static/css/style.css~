@@ -22,5 +22,5 @@
             font-size: 1.25em;
 }
 .model-ranking {
-	    min-width: 200px;
+	    width: 200px;
 }

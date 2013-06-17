@@ -42,22 +42,20 @@ def ballot2form(ballot,readonly=False,counters=None,filled=False):
         if isinstance(counters,dict):
             return INPUT(_type='text',_readonly=True,
                          _value=counters.get(key,0),
-                         _class='model-'+scheme,
                          _style="width:3em").xml()
         ### CHECK THIS!
         #if counters is not None and 'x' in item.group().lower():
         #    counters[key] = counters.get(key,0)+1
         ### CHECK THIS!
-        if scheme == 'checkbox':
+        if not item.group(2):
             name = name+'-%s-%s' % (item.group(2)[1:], value)
             return INPUT(_type='radio',_name=name,_value=value,
                          _checked=('!' in item.group()),
-                         _class='model-'+scheme,
                          _disabled=readonly).xml()    
-        elif scheme == 'ranking':
+        else:
             return INPUT(_type='input',_name=name,_value=value,
                          _checked=('!' in item.group()),
-                         _class='model-'+scheme,
+                         _class='model-'+item.group(2)[1:],
                          _disabled=readonly,
                          ).xml()   
     body = regex_field.sub(radio,ballot.replace('\r',''))

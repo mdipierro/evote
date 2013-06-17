@@ -36,3 +36,5 @@ db.define_table(
     Field('ballot_uuid'), # uuid embedded in ballot
     Field('signature')) # signature of ballot (voted or blank)
 
+db(db.ballot).update(voted=False)
+db(db.voter).update(voted=False)
