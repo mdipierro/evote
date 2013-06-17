@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-DEVELOPMENT  = True
+DEVELOPMENT  = False
 DBURI        = 'sqlite://storage.sqlite'
 EMAIL_SENDER = 'i.vote.secure@gmail.com'
 EMAIL_SERVER = 'localhost'
 EMAIL_LOGIN  = None
 GMAIL_LOGIN  = None
 AS_SERVICE = True
-DEBUG_MODE = True
+DEBUG_MODE = False
 SCHEME = 'http' or 'https' # scheme for access to voting
 
 response.title = 'E-Vote'
