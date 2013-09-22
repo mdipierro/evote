@@ -49,12 +49,12 @@ def ballot2form(ballot,readonly=False,counters=None,filled=False):
         #    counters[key] = counters.get(key,0)+1
         ### CHECK THIS!
         if scheme == 'checkbox':
-            name = name+'-%s-%s' % (item.group(2)[1:], value)
             return INPUT(_type='radio',_name=name,_value=value,
                          _checked=('!' in item.group()),
                          _class='model-'+scheme,
-                         _disabled=readonly).xml()    
+                         _disabled=readonly).xml()
         elif scheme == 'ranking':
+            name = name+'-%s-%s' % (item.group(2)[1:], value)
             return INPUT(_type='input',_name=name,_value=value,
                          _checked=('!' in item.group()),
                          _class='model-'+scheme,
@@ -70,14 +70,7 @@ def form2ballot(ballot,token,vars,results):
     def check(item):        
         name = 'ck_'+item.group(1)
         value = radioes[name] = radioes.get(name,0)+1
-        if not item.group(2):
-            scheme = 'checkbox'
-            checked = vars.get(name,0)==str(value)
-            if isinstance(results,dict):
-                results[(name,scheme,value)] = checked
-            return INPUT(_type="radio",_name=name,_value=value,
-                         _disabled=True,_checked=checked).xml()
-        else:
+        if item.group(2):
             scheme = item.group(2)[1:]
             name2 = name+'-%s-%s' % (scheme, value)
             rank = vars.get(name2,0)            
@@ -85,6 +78,13 @@ def form2ballot(ballot,token,vars,results):
                 results[(name,scheme,value)] = int(rank)
             return INPUT(_type="input",_name=name2,_value=rank,
                          _disabled=True).xml()
+        else:
+            scheme = 'checkbox'
+            checked = vars.get(name,0)==str(value)
+            if isinstance(results,dict):
+                results[(name,scheme,value)] = checked
+            return INPUT(_type="radio",_name=name,_value=value,
+                         _disabled=True,_checked=checked).xml()
     ballot_content = regex_field.sub(check,ballot.replace('\r',''))
     if token: ballot_content += '<pre>\n%s\n</pre>' % token
     return '<div class="ballot">%s</div>' % ballot_content.strip()
