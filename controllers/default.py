@@ -382,6 +382,10 @@ def vote():
     return dict(form=form)
 
 def user():
+    if USERS_FILENAME:
+        auth.settings.register_onvalidation = lambda form: \
+            form.vars.email not in users_emails and \
+            form.errors.update({'email':T('Not Authorized')})
     return dict(form=auth())
 
 def invalid_link():

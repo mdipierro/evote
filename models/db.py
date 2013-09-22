@@ -35,3 +35,18 @@ auth.settings.reset_password_requires_verification = True
 from gluon.contrib.login_methods.rpx_account import use_janrain
 use_janrain(auth,filename='private/janrain.key')
 auth.settings.actions_disabled.append('profile')
+
+# if resticted to some users
+def load_users_emails(filename=USERS_FILENAME):
+    import urllib, os
+    if not filename:
+        emails = []
+    elif filename.startswith('http://') or filename.startswith('https://'):
+        emails = urllib.urlopen(filename).read().split('\n')
+    elif os.path.exists(filename):
+        emails = open(filename).read().split('\n')
+    else:
+        emails = []
+    emails = [email.strip() for email in emails if email.strip()]
+    return emails
+users_emails = cache.ram('users_emails',load_users_emails,3600)
