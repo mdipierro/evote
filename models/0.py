@@ -8,7 +8,7 @@ GMAIL_LOGIN  = None
 AS_SERVICE = True
 DEBUG_MODE = False
 SCHEME = 'http' or 'https' # scheme for access to voting
-USERS_FILENAME = 'authorized.users'
+USERS_FILENAME = None
 
 response.title = 'E-Vote'
 response.subtitle = 'Free Secure Trusted Verifiable Online Voting'
