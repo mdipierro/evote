@@ -26,7 +26,7 @@ mail.settings.sender = EMAIL_SENDER
 mail.settings.login = EMAIL_LOGIN
 
 ## configure auth policy
-auth.settings.registration_requires_verification = not DEVELOPMENT
+auth.settings.registration_requires_verification = not (DEVELOPMENT or USERS_FILENAME)
 auth.settings.registration_requires_approval = False
 auth.settings.reset_password_requires_verification = True
 

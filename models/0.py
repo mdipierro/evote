@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-DEVELOPMENT  = True
+DEVELOPMENT  = False
 DBURI        = 'sqlite://storage.sqlite'
 EMAIL_SENDER = 'i.vote.secure@gmail.com'
-EMAIL_SERVER = 'logging' if DEVELOPMENT else 'localhost'
+EMAIL_SERVER = 'localhost'
 EMAIL_LOGIN  = None
 GMAIL_LOGIN  = None
 AS_SERVICE = True
