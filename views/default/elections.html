@@ -48,13 +48,15 @@
 	<span class="caret"></span>
       </a>
       <ul class="dropdown-menu">
+	{{if not row.closed:}}
+	{{=LI(A(I(_class='icon-edit'),' ',T('Edit Election'),_href=URL('edit',args=row.id)))}}
 	{{=LI(A(I(_class='icon-play-circle'),' ',T('Start Election'),_href=URL('start',args=row.id)))}}
 	{{=LI(A(I(_class='icon-envelope'),' ',T('Send Reminder'),_href=URL('reminders',args=row.id)))}}
 	{{=LI(A(I(_class='icon-off'),' ',T('Close Election'),_href=URL('close_election',args=row.id)))}}
+	{{pass}}
 	{{=LI(A(I(_class='icon-folder-open'),' ',T('Ballots'),_href=URL('ballots',args=row.id)))}}
 	{{=LI(A(I(_class='icon-list'),' ',T('Results'),_href=URL('results',args=row.id)))}}
 	{{=LI(A(I(_class='icon-download'),' ',T('CSV Voters'),_href=URL('voters_csv.csv',args=row.id)))}}
-	{{=LI(A(I(_class='icon-edit'),' ',T('Edit Election'),_href=URL('edit',args=row.id)))}}
       </ul>
     </div>
   </td>

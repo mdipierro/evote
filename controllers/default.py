@@ -36,6 +36,7 @@ def edit():
 @auth.requires(auth.user and auth.user.is_manager)
 def start():    
     election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
+    check_closed(election)
     response.subtitle = election.title+T(' / Start')
     demo = ballot2form(election.ballot_model)
     return dict(demo=demo,election=election)
@@ -43,6 +44,7 @@ def start():
 @auth.requires(auth.user and auth.user.is_manager)
 def start_callback():
     election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
+    check_closed(election)
     form = SQLFORM.factory(
         submit_button=T('Email Voters and Start Election Now!'))
     form.element(_type='submit').add_class('btn')
@@ -259,11 +261,18 @@ def email_voter_and_managers(election,voter,ballot,message):
               sender=sender, reply_to=sender)
     return ret
 
+def check_closed(election):
+    if election.closed:
+        session.flash = T('Election already closed')
+        redirect(URL('elections'))
+
+
 @auth.requires(auth.user and auth.user.is_manager)
 def close_election():
     import zipfile, os
     election = db.election(request.args(0,cast=int)) or \
         redirect(URL('invalid_link'))
+    check_closed(election)
     response.subtitle = election.title
     dialog = FORM.confirm(T('Close'),
                           {T('Cancel'):URL('elections')})
@@ -307,6 +316,7 @@ def close_election():
             orderby=db.ballot.ballot_uuid)
         archive.writestr('ballots.csv',str(ballots))
         archive.close()
+        election.update_record(closed=True)
         session.flash = 'Election Closed!'
         redirect(URL('results',args=election.id))
     return dict(dialog=dialog,election=election)
