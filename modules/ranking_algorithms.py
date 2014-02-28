@@ -18,22 +18,26 @@ def is_valid(vote):
 def iro(votes):
     """ instant run-off voting """
     winners = []
-    ignored = set()    
+    losers = set()    
     n = len(reduce(lambda a,b:a|b,[set(vote) for vote in votes]))
     while True:
+        # options maps candidates to count of ballots
+        # who voted for that candidate in first place
+        # after ignoring some candidates
         options = {}
         for vote in votes:
             if is_valid(vote):
                 for item in vote:
-                    if not item in ignored:
+                    if not item in losers:
                         options[item] = options.get(item,0)+1
                         break
-        options = [(v,k) for (k,v) in options.items()]
-        options.sort()
+
+        options_list = [(v,k) for (k,v) in options.items()]
+        options_list.sort()
         #print options
-        minv = options[0][0]
-        [ignored.add(k) for (v,k) in options if v==minv]
-        [winners.append((v,k)) for (v,k) in options if v==minv]
+        minv = options_list[0][0]
+        [losers.add(k) for (v,k) in options_list if v==minv]
+        [winners.append((v,k)) for (v,k) in options_list if v==minv]
         if len(winners)==n:
             return winners
 
@@ -45,9 +49,9 @@ def borda(votes, ignored=set(), mode='linear'):
     n = len(votes[0])
     for vote in votes:
         if is_valid(vote):
+            if len(vote)!=len(set(vote)):
+                raise InvalidVote
             for k,item in enumerate(vote):
-                if vote.count(item)>1:
-                    raise InvlidVote
                 if not item in ignored:
                     if mode == 'linear':
                         delta = linear*(n-k)
