@@ -177,6 +177,12 @@ def reminders_callback():
             redirect(URL('elections'),client_side=True)
     return dict(form=form,failures=failures,election=election)
 
+@auth.requires(auth.user and auth.user.is_manager)
+def recompute_results():
+    election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
+    compute_results(election)
+    redirect(URL('elections'))
+
 def compute_results(election):
     voted_ballots = db(db.ballot.election_id==election.id
                        )(db.ballot.voted==True).select()
@@ -231,6 +237,7 @@ def hash_ballot(text):
     import re
     text = text.replace('checked="checked" ','')
     text = text.replace('disabled="disabled" ','')
+    text = re.sub('value="\d+"','',text)
     text = re.sub('ballot\S+','',text)
     return hash(text)
 
