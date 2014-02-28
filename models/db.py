@@ -12,9 +12,11 @@ auth = Auth(db)
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
 ## create all tables needed by auth if not custom tables
+maybe_can_choose = AS_SERVICE or DEVELOPMENT
 auth.settings.extra_fields['auth_user'] = [
-    Field('is_manager','boolean',default=AS_SERVICE or DEVELOPMENT,
-          writable=False,readable=False)]
+    Field('is_manager','boolean',default=False,
+          writable=maybe_can_choose, readable=maybe_can_choose)]
+
 auth.define_tables(username=False, signature=False)
 
 ## configure email
@@ -34,7 +36,7 @@ auth.settings.reset_password_requires_verification = True
 ## register with janrain.com, write your domain:api_key in private/janrain.key
 from gluon.contrib.login_methods.rpx_account import use_janrain
 use_janrain(auth,filename='private/janrain.key')
-auth.settings.actions_disabled.append('profile')
+#auth.settings.actions_disabled.append('profile')
 
 # if resticted to some users
 def load_users_emails(filename=USERS_FILENAME):
