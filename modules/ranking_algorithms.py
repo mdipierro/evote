@@ -17,29 +17,48 @@ def is_valid(vote):
 
 def iro(votes):
     """ instant run-off voting """
+    # winners is a list of (v,k) = (number of preferences, option number)
+    # ordered from the candidate with the least preferences to the highest
     winners = []
     losers = set()    
-    n = len(reduce(lambda a,b:a|b,[set(vote) for vote in votes]))
-    while True:
+    allowed_options = reduce(lambda a,b:a|b,[set(vote) for vote in votes])
+    n = len(allowed_options)
+    while len(winners)<n:
         # options maps candidates to count of ballots
         # who voted for that candidate in first place
         # after ignoring some candidates
         options = {}
-        for vote in votes:
+        # important! options must be initialized to that all options
+        # are present, even nobody choose them as their first option
+        # else 0 counts would not be present
+        for item in allowed_options:
+            if not item in losers:
+                options[item] = 0
+        # for every ballot
+        for vote in votes: 
+            # if the vote for the ballot is valid
             if is_valid(vote):
+                # for each voting option in this balloe
                 for item in vote:
+                    # if the option(candidate) have not been
+                    # alreday discurded
                     if not item in losers:
-                        options[item] = options.get(item,0)+1
+                        # count how many ballot have this option 
+                        # as first option
+                        options[item] += 1
                         break
-
+                    
+        # find the option(candidate) with the least number of
+        # top preferences                    
         options_list = [(v,k) for (k,v) in options.items()]
         options_list.sort()
-        #print options
         minv = options_list[0][0]
-        [losers.add(k) for (v,k) in options_list if v==minv]
-        [winners.append((v,k)) for (v,k) in options_list if v==minv]
-        if len(winners)==n:
-            return winners
+        # discard this option and count again
+        for (v,k) in options_list:
+            if v==minv:
+                losers.add(k)
+                winners.append((v,k))
+    return winners
 
 def borda(votes, ignored=set(), mode='linear'):
     """ borda voting when mode="linear" """
@@ -96,12 +115,12 @@ def schulze(votes):
     
     
 
-def test(nsamples=1000):
+def test(nsamples=10):
     diff_iro_borda = 0
     diff_iro_schulze = 0
     diff_borda_schulze = 0
     for k in range(nsamples):
-        votes = makeup_votes()            
+        votes = makeup_votes(10)            
         a = iro(votes)
         b = borda(votes,mode="exponential")
         c = schulze(votes)
