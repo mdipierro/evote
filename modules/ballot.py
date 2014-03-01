@@ -28,7 +28,9 @@ def unpack_results(results):
     return ast.literal_eval(results) if have_ast else eval(results)
 
 def ballot2form(ballot,readonly=False,counters=None,filled=False):
-    """ if counters is passed this counts the results in the ballot """    
+    """If counters is passed this counts the results in the ballot.
+    If readonly is False, then the voter has not yet voted; if readonly
+    is True, then they have just voted."""    
     radioes = {}    
     if isinstance(counters,dict): readonly=True
     def radio(item):     
