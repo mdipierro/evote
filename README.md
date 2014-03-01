@@ -64,7 +64,7 @@ In a normal E-Vote deployment, anyone can create their own user account by going
 
 Now that we've created the user, what can she do?
 
-A user can create new elections, and vote in elections where she have been named as a voter.
+A user can create new elections, and vote in elections where she has been named as a voter.
 
 This may sound surprising -- after all, one might imagine that there is a single E-Vote administrator (perhaps the person who knows the initial admin password mentioned earlier in "Administrating E-Vote") who sets up elections, and who is separate from the voters who vote in those elections.  But that's not how E-Vote works.  Instead, anyone with an account can set up an election, assuming they have the "is_manager" flag set on their account, which is something they themselves can set when they register the account, or can change later by pulling down the the upper right user menu and clicking on "Profile" to manager their account (try it!).
 
