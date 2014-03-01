@@ -27,14 +27,14 @@ E-Vote uses the [web2py](http://web2py.com/) framework and can be installed like
            http://127.0.0.1:8000/evote/default/index
         ...in your browser.
 
-To deploy at the root of the site (e.g., at http://127.0.0.1:8000/ instead of http://127.0.0.1:8000/evote/default/index), simply name the E-Vote directory applications/init/ instead of applications/evote/.  The magic name "init" will cause E-Vote to appear at the site root.
+To deploy at the root of the site (e.g., at http://127.0.0.1:8000/ instead of http://127.0.0.1:8000/evote/default/index), simply name the E-Vote directory `applications/init/` instead of `applications/evote/`.  The magic name "init" will cause E-Vote to appear at the site root.
 
 To deploy E-Vote in production, you may want to go to [web2py.com](http://web2py.com) and learn more about deploying web2py-based applications in general.  If you're in a hurry, see `scripts/setup-*.sh` in the web2py tree.  One common way to deploy web2py applications is with WSGI under Apache HTTPD: in the web2py tree, copy `handlers/wsgihandler.py` to the top level of the tree, and set the appropriate WSGI options in the Apache configuration.  See the [Deployment recipes](http://web2py.com/book/default/chapter/13) chapter in the web2py manual for more.
 
 Administrating E-Vote
 ---------------------
 
-Let's assume you installed E-vote as site root, in applications/init/.
+Let's assume you installed E-vote as site root, in `applications/init/`.
 
 When you first launched the web server ('python web2py.py' in the above example), you were prompted to set an admin password.  That password allows you to log in on the web2py administration console:
 
@@ -51,14 +51,14 @@ Customizing E-Vote's Appearance
 
 (Again, this somewhat duplicates web2py documentation, but since E-Vote users are most likely to want to customize their election sites' front pages and make other basic changes, we cover that here.)
 
-We again assume you installed in the site root, as applications/init/.
+We again assume you installed in the site root, as `applications/init/`.
 
 Your site's pages live in init/views/default/.  For example, the front page is init/views/default/index.html.  These view files are mostly written in HTML, but they contain occasional Python and template code embedded between double curly braces, e.g., "{{extend 'layout.html'}}". See [web2py.com/books/default/chapter/29/05/the-views](http://web2py.com/books/default/chapter/29/05/the-viewshttp://web2py.com/books/default/chapter/29/05/the-views) for more about views and the templating commands available.
 
 Registering Users and Running Elections
 ----------------------------------------
 
-We cover the topics of registering users and running elections because they are somewhat intertwined.
+We cover the topics of registering users and running elections together, because they are somewhat intertwined.
 
 In a normal E-Vote deployment, anyone can create their own user account by going to the front page, pulling down the "Login" menu on the upper right, and choosing "Register".  After entering some information that includes their email address and a password of their choice, they will be sent an email with a unique link.  To confirm the registration, they visit that link and enter their email addres and password.  Now that user account exists.  (See "Testing E-Vote Without Email" below for how to try all this without involving a mail delivery system.)
 
