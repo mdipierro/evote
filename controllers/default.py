@@ -235,7 +235,7 @@ def compute_results(election):
                 vote[ranking-1] = value
             else:
                 raise RuntimeError("Invalid Voting Scheme")
-    print 'here', rankers
+    # print 'here', rankers
     for name in rankers:
         votes = rankers[name]
         cmajority = borda(votes,mode='exponential')
