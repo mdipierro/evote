@@ -181,30 +181,61 @@ def reminders_callback():
 def recompute_results():
     election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
     compute_results(election)
-    redirect(URL('elections'))
+    redirect(URL('results',args=election.id))
 
 def compute_results(election):
     voted_ballots = db(db.ballot.election_id==election.id
                        )(db.ballot.voted==True).select()
     counters = {}
     rankers = {}
-    for ballot in voted_ballots:
+    for k,ballot in enumerate(voted_ballots):
         results = unpack_results(ballot.results)
         for key in results:
-            (name,scheme,value) = key
+            # name is the name of a group as in {{name:ranking}}
+            # scheme is "ranking" or "checkbox" (default)
+            # value is the <input value="value"> assigned to this checkbox or input
+            (name,scheme,value) = key 
             if scheme == 'checkbox':
+                # counters[key] counts how many times this checkbox was checked
                 counters[key] = counters.get(key,0) + (
-                    1 if results[key] else 0)
+                    1 if results[key] else 0)                
             elif scheme == 'ranking':
+                # rankers[name] = [[2,1,3],[3,1,2],[1,2,3],...]
+                #                 The sublists in rankers mean:
+                #                 [[my first-preferred candidate is
+                #                   the candidate whose identifying
+                #                   number on the original ballot was
+                #                   <the number given in this first
+                #                   position here>],
+                #                  [my second-preferred candidate is
+                #                   the candidate whose identifying
+                #                   number on the original ballot was
+                #                   <the number given in this second
+                #                   position here>],
+                #                  [my third-preferred candidate is
+                #                   the candidate whose identifying
+                #                   number on the original ballot was
+                #                   <the number given in this third
+                #                   position here>], ...]
+                #
+                # len(rankers[name]) = len(voted_ballots)
+                # rankers[name][i][0] = ...?
                 if not name in rankers:
-                    rankers[name] = [[]]
+                    rankers[name] = []
+                if len(rankers[name])<k+1:
+                    rankers[name].append([])
                 vote = rankers[name][-1]
-                position = int(results[key])
-                d = position-len(vote)
-                if d>0: vote+=[0]*d
-                vote[position-1] = value
+                print "ballot id:",ballot.id, "key:",key, "results[key]:",results[key], "vote:",vote
+                ranking = int(results[key])
+                d = ranking-len(vote)
+                if d>0:
+                    print "vote before:", vote
+                    vote+=[0]*d
+                    print "vote after: ", vote
+                vote[ranking-1] = value
             else:
                 raise RuntimeError("Invalid Voting Scheme")
+    # print 'here', rankers
     for name in rankers:
         votes = rankers[name]
         cmajority = borda(votes,mode='exponential')
