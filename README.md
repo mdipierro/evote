@@ -8,7 +8,7 @@ Overview
 
 The elections site administrator sets up the election via the web admin interface; setting up the election involves creating a page listing the ballot items (e.g., candidates), and specifying the electorate (the voters, who are represented by email addresses).
 
-Once the election is opened, each voter will receive a unique, non-identifying token by email.  Using that token, the voter visits a corresponding ballot page iva their web browser.  One such ballot is created for each voter in the election, and the ballot has its own unique identifier (different from the token received in the email).  Each voter casts their vote using their unique but unidentifiable ballot.  Eventually the election is closed, perhaps manually or perhaps based on a pre-set time, and no more votes can be cast.
+Once the election is opened, each voter will receive a unique, non-identifying token by email.  Using that token, the voter visits a corresponding ballot page via their web browser.  One such ballot is created for each voter in the election, and the ballot has its own unique identifier (different from the token received in the email).  Each voter casts their vote using their unique but unidentifiable ballot.  Eventually the election is closed, perhaps manually or perhaps based on a pre-set time, and no more votes can be cast.
 
 While no voter knows any unique ballot identifier other than their own, the election administrators can publish the list of *all* unique identifiers and how they voted.  Each voter can then verify that their own vote was properly recorded, and thus the electorate as a whole can verify the results.
 
