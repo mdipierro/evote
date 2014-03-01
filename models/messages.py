@@ -13,13 +13,14 @@ db.election.ballot_model.default = """
 <li>{{group_one:ranking}} Candidate C in a ranked-choice group</li>
 </ul>
 
-<p>The second group, identified by the <tt>&#123;&#123;group_two&#125;&#125;</tt>, involves four candidates, from whom the voter must choose exactly one:</p>
+<p>The second group, identified by the <tt>&#123;&#123;group_two&#125;&#125;</tt>, involves four candidates, from whom the voter must choose exactly one (since browser radio buttons don't have a way to do "uncheck all" once one has been selected, it is typical to offer an "Abstain" option here):</p>
 
 <table>
 <tr><td>Candidate 1</td><td>{{group_two}}</td></tr>
 <tr><td>Candidate 2</td><td>{{group_two}}</td></tr>
 <tr><td>Candidate 3</td><td>{{group_two}}</td></tr>
 <tr><td>Candidate 4</td><td>{{group_two}}</td></tr>
+<tr><td>Abstain</td><td>{{group_two}}</td></tr>
 </table>
 
 <p>The next section lists a set of five candidates among whom voters are asked to do <em>approval voting</em>, that is, to vote "yes" for those candidates they approve of, "no" for those they don't approve, or to vote "abstain" if they have no opinion.  The way we specify that here is a little tricky: each candidate is its <em>own</em> group&nbsp;&mdash;&nbsp;we use labels like <tt>&#123;&#123;candidate_1&#125;&#125;</tt>, <tt>&#123;&#123;candidate_2&#125;&#125;</tt>, etc here for clarity, but they could as easily be <tt>&#123;&#123;snufflewhump&#125;&#125;</tt>, <tt>&#123;&#123;firenze&#125;&#125;</tt>, etc.  It doesn't matter what the labels are, so long as they are consistent across the target candidate and different from any other candidate on this page:</p>
