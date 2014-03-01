@@ -70,9 +70,9 @@ This may sound surprising -- after all, one might imagine that there is a single
 
 So let's set up an election.  After making sure your "is_manager" flag is turned on, choose "Elections" from the nav bar at the top, then click the `New Election` button under "Create a election."
 
-You'll see a ballot creation form, which should be self-explanatory.  Edit it to look like the ballot you want voters to see.  Then put the email addresses of all thoe voters in the `Voters` box, one per line (those voters will receive unique tokens by email that allow them to vote in this election).  If there's anyone else you want able to manage this election, add them to the "Managers" box.
+You'll see a ballot creation form, which should be self-explanatory.  Edit it to look like the ballot you want voters to see.  Then put the email addresses of all those voters in the `Voters` box, one per line (those voters will receive unique tokens by email that allow them to vote in this election).  If there's anyone else you want able to manage this election, add them to the "Managers" box.
 
-Once you click the `Save and Preview`, you will be brought to a preview page where you can make sure the ballot looks exactly as you want the voters to see it.  Test it out -- in particular, if you are doing any ranked-choice elections, try dragging those candidates up and down and make sure the text above that group informs voters that they can drag to reorder.
+Click `Save and Preview` to be brought to a preview page where you can make sure the ballot looks exactly as you want the voters to see it.  Test it out -- in particular, if you are doing any ranked-choice elections, try dragging those candidates up and down and make sure the text above that group informs voters that they can drag to reorder.
 
 Once you're satisfied, go to the top of the page and click `Email Voters and Start Election Now`.  This will cause the ballot emails to go out to voters.
 
@@ -81,7 +81,7 @@ Concluding Elections
 
 An election closes either on the date that was specified, if any, when the election was set up, or when one of the election's managers manually closes it from their Elections administration page (click on "Elections" in the nav bar).
 
-When you close an election is closed, will see a results page such as
+When you close an election, will see a results page such as
 
       http://hostname_or_ip_etc.com/init/default/results/6
 
@@ -116,11 +116,11 @@ If you'd like to test all this out without worrying about email-sending configur
 
       EMAIL_SERVER = 'localhost'
 
-change "localhost" to "logging":
+Change "localhost" to "logging"...
 
       EMAIL_SERVER = 'logging'   # 'localhost'
 
-Now the emails will just print out on the web server console instead of being sent.  You'll see things like this on the console:
+...and now the emails will print out on the web server console instead of being sent.  You'll see things like this on the console:
 
       Welcome jrandom@example.com!  Click on the link
       http://hostname_or_ip_etc.com/init/default/user/verify_email/18b9f977-249f-45e8-93fe-59161a687f88 
