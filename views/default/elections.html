@@ -1,46 +1,41 @@
 {{extend 'layout.html'}}
 
-{{if auth.user.is_manager:}}
-<h2>Create a new election</h2>
-{{=A(T('New Election'),_href=URL('edit'),_class="btn")}}
-{{pass}}
 
-<h1>My Elections</h1>
+
+
 
 {{if ballots:}}
 <h2>Elections requiring your vote</h2>
-<div style="width:80%">
+
 <table class="table">
 {{for ballot in ballots:}}
 <tr>
   <td>
-    <i class="icon-folder-close"></i>
-    {{=ballot.election.title}} ({{=ballot.election.id}})
+    <i class="icon-folder-open"></i>
+    {{=A(ballot.election.title, _href=URL('vote',args=(ballot.election.id,ballot.voter.voter_uuid)))}}
   </td>
-  <td>
-    <a class="btn" style="float:right" href="{{=URL('vote',args=(ballot.election.id,ballot.voter.voter_uuid))}}">Vote</a>
-  </td>
+
 </tr>
 {{pass}}
 </table>
-</div>
-{{else:}}
-<h2>No elections require your vote</h2>
+
 {{pass}}
 
 {{if elections:}}
 <h2>Elections managed by you</h2>
+{{if auth.user.is_manager:}}
+{{=A(T('New Election'),_href=URL('edit'),_class="btn")}}
+{{pass}}
 
-<div style="width:80%">
 <table class="table">
 {{for row in elections:}}
 <tr>
   <td>
-    <i class="icon-folder-close"></i> {{=row.title}}
+    
     {{if row.deadline and row.deadline<request.now:}}
-    <span class="election-closed">closed</span>
+    <i class="icon-folder-close"></i> {{=row.title}}
     {{else:}}
-    <span class="election-open">open</span>
+    <i class="icon-folder-open"></i> {{=row.title}}
     {{pass}}
   </td>
   <td>    
@@ -58,7 +53,9 @@
 	{{pass}}
 	{{=LI(A(I(_class='icon-folder-open'),' ',T('Ballots'),_href=URL('ballots',args=row.id)))}}
 	{{=LI(A(I(_class='icon-list'),' ',T('Results'),_href=URL('results',args=row.id)))}}
+    {{if not row.closed:}}
 	{{=LI(A(I(_class='icon-download'),' ',T('CSV Voters'),_href=URL('voters_csv.csv',args=row.id)))}}
+    {{pass}}
       </ul>
     </div>
   </td>
@@ -68,6 +65,7 @@
 </div>
 {{else:}}
 <h2>There are no elections managed by you</h2>
+{{if auth.user.is_manager:}}
+{{=A(T('New Election'),_href=URL('edit'),_class="btn")}}
 {{pass}}
-
-
+{{pass}}

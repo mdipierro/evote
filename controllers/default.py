@@ -14,6 +14,7 @@ def elections():
     ballots = db(db.voter.email == auth.user.email)(
         db.voter.voted==False)(db.voter.election_id==db.election.id)(
         (db.election.deadline==None)|(db.election.deadline>request.now)).select()
+
     return dict(elections=elections,ballots=ballots)
 
 @auth.requires(auth.user and auth.user.is_manager)
