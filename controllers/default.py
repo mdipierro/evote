@@ -9,7 +9,7 @@ def index():
 @auth.requires_login()
 def elections():
     response.subtitle = T('My Elections')
-    elections = db(db.election.created_by==auth.user.id).select(
+    elections = db(auth.user.email in db.election.managers).select(
         orderby=~db.election.created_on)
     ballots = db(db.voter.email == auth.user.email)(
         db.voter.voted==False)(db.voter.election_id==db.election.id)(
@@ -21,7 +21,7 @@ def elections():
 def edit():
     response.subtitle = T('Edit Ballot')
     election = db.election(request.args(0,cast=int,default=0))
-    if election and not election.created_by==auth.user_id:
+    if election and not auth.user.email in db.election.managers:
         redirect(URL('not_authorized'))
     if not election:
         (pubkey, privkey) = rsakeys()
@@ -37,6 +37,8 @@ def edit():
 @auth.requires(auth.user and auth.user.is_manager)
 def start():    
     election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
+    if election and not election.created_by==auth.user_id:
+        redirect(URL('not_authorized'))
     check_closed(election)
     response.subtitle = election.title+T(' / Start')
     demo = ballot2form(election.ballot_model)
