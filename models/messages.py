@@ -74,3 +74,23 @@ def meta_send(*args, **kwargs):
         mail.settings.server = 'smtp.gmail.com:587'
         mail.settings.login = GMAIL_LOGIN
     return mail.send(*args, **kwargs)
+
+def meta_send2(to,message,reply_to,subject,sender=None):
+    import smtplib
+    if kwargs.get('sender') == 'i.vote.secure@gmail.com' and GMAIL_LOGIN:
+        mail.settings.server = 'smtp.gmail.com:587'
+        mail.settings.login = GMAIL_LOGIN
+    fromaddr = sender or mail.settings.sender
+    msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\nReply-to: %s\r\n\r\n%s" \
+        % (fromaddr, to, subject, reply_to, message)
+    try:
+        server = None
+        server = smtplib.SMTP(mail.settings.server,timeout=5)
+        server.sendmail(fromaddr, [to], msg)
+        return True
+    except:
+        return False
+    finally:
+        if server:
+            server.quit()
+

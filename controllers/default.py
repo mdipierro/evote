@@ -61,10 +61,10 @@ def start_callback():
             else:
                 # create a voter
                 voter_uuid = 'voter-'+uuid()
-                db.voter.insert(
+                id = db.voter.insert(
                     election_id=election.id,
                     voter_uuid=voter_uuid,
-                    email=email,invited_on=request.now)
+                    email=email,invited_on=None)
                 # create a ballot
                 ballot_counter+=1
                 ballot_uuid = 'ballot-%i-%.6i' % (election.id,ballot_counter)
@@ -87,12 +87,14 @@ def start_callback():
                                       link_ballots=link_ballots,
                                       link_results=link_results)
             subject = '%s [%s]' % (election.title, election.id)
-            emails.append((email,subject,message))
+            emails.append((id,email,subject,message))
         db.commit()
         sender = election.email_sender or mail.settings.sender
-        for to, subject, message in emails:
-            if not meta_send(to=to,subject=subject,message=message,
-                             sender=sender, reply_to=sender):
+        for id, to, subject, message in emails:
+            if meta_send2(to=to,subject=subject,message=message,
+                          sender=sender, reply_to=sender):
+                db(db.voter.id==id).update(invited_on=request.now)
+            else:
                 failures.append(email)
         if not failures:
             session.flash = T('Emails sent successfully')
@@ -124,8 +126,9 @@ def self_service():
                                       link_ballots=link_ballots,
                                       link_results=link_results)
             sender = election.email_sender or mail.settings.sender
-            if meta_send(to=voter.email,subject=election.title,message=message,
-                         sender=sender, reply_to=sender):
+            if meta_send2(to=voter.email,subject=election.title,
+                          message=message,
+                          sender=sender, reply_to=sender):
                 response.flash = T('Email sent')
             else:
                 response.flash = T('Unable to send email')
@@ -169,8 +172,8 @@ def reminders_callback():
     if form.accepted:
         sender = election.email_sender or mail.settings.sender
         for to, subject, message in emails:
-            if not meta_send(to=to,subject=subject,message=message,
-                             sender=sender, reply_to=sender):
+            if not meta_send2(to=to,subject=subject,message=message,
+                              sender=sender, reply_to=sender):
                 failures.append(email)
         if not failures:
             session.flash = T('Emails sent successfully')
