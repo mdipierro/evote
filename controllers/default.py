@@ -61,7 +61,7 @@ def start_callback():
             else:
                 # create a voter
                 voter_uuid = 'voter-'+uuid()
-                id = db.voter.insert(
+                voter = db.voter.insert(
                     election_id=election.id,
                     voter_uuid=voter_uuid,
                     email=email,invited_on=None)
@@ -87,15 +87,15 @@ def start_callback():
                                       link_ballots=link_ballots,
                                       link_results=link_results)
             subject = '%s [%s]' % (election.title, election.id)
-            emails.append((id,email,subject,message))
+            emails.append((voter,email,subject,message))
         db.commit()
         sender = election.email_sender or mail.settings.sender
-        for id, to, subject, message in emails:
+        for voter, to, subject, message in emails:
             if meta_send2(to=to,subject=subject,message=message,
                           sender=sender, reply_to=sender):
-                db(db.voter.id==id).update(invited_on=request.now)
+                db(db.voter.id==voter).update(invited_on=request.now)
             else:
-                failures.append(email)
+                failures.append(to)
         if not failures:
             session.flash = T('Emails sent successfully')
             redirect(URL('elections'),client_side=True)
