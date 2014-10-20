@@ -284,7 +284,7 @@ def ballots():
                        for b in ballots if b.voted))>1
     return dict(ballots=ballots,election=election, tampered=tampered)
 
-@auth.requires(auth.user and auth.user.is_manager)
+#@auth.requires(auth.user and auth.user.is_manager)
 def email_voter_and_managers(election,voter,ballot,message):
     import cStringIO
     attachment = mail.Attachment(
