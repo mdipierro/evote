@@ -7,7 +7,7 @@
 
 response.logo = None
 response.title = request.application.replace('_',' ').title()
-response.subtitle = T('customize me!')
+response.subtitle = T('Electornic Voting Service')
 
 ## read more at http://dev.w3.org/html5/markup/meta.name.html
 response.meta.author = 'Your Name <you@example.com>'
