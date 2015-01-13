@@ -91,8 +91,7 @@ def start_callback():
         db.commit()
         sender = election.email_sender or mail.settings.sender
         for voter, to, subject, message in emails:
-            if meta_send2(to=to,subject=subject,message=message,
-                          sender=sender, reply_to=sender):
+            if mail.send(to=to,subject=subject,message=message):
                 db(db.voter.id==voter).update(invited_on=request.now)
             else:
                 failures.append(to)
@@ -126,9 +125,7 @@ def self_service():
                                       link_ballots=link_ballots,
                                       link_results=link_results)
             sender = election.email_sender or mail.settings.sender
-            if meta_send2(to=voter.email,subject=election.title,
-                          message=message,
-                          sender=sender, reply_to=sender):
+            if mail.send(to=voter.email,subject=election.title,message=message):
                 response.flash = T('Email sent')
             else:
                 response.flash = T('Unable to send email')
@@ -172,8 +169,7 @@ def reminders_callback():
     if form.accepted:
         sender = election.email_sender or mail.settings.sender
         for to, subject, message in emails:
-            if not meta_send2(to=to,subject=subject,message=message,
-                              sender=sender, reply_to=sender):
+            if not mail.send(to=to,subject=subject,message=message):
                 failures.append(email)
         if not failures:
             session.flash = T('Emails sent successfully')
@@ -291,14 +287,12 @@ def email_voter_and_managers(election,voter,ballot,message):
         filename=ballot.ballot_uuid+'.html',
         payload=cStringIO.StringIO(ballot.ballot_content))
     sender = election.email_sender or mail.settings.sender
-    ret = meta_send(to=voter.email,
+    ret = mail.send(to=voter.email,
                     subject='Receipt for %s' % election.title,
-                    message=message,attachments=[attachment],
-                    sender=sender, reply_to=sender)
-    meta_send(to=regex_email.findall(election.managers),
+                    message=message,attachments=[attachment])
+    mail.send(to=regex_email.findall(election.managers),
               subject='Copy of Receipt for %s' % election.title,
-              message=message,attachments=[attachment],
-              sender=sender, reply_to=sender)
+              message=message,attachments=[attachment])
     return ret
 
 def check_closed(election):
