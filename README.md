@@ -17,7 +17,7 @@ Installing E-Vote
 
 E-Vote uses the [web2py](http://web2py.com/) framework and can be installed like any other web2py application; see the web2py documentation for details.  If you just want to try out E-Vote quickly, here is one way to get it up and running on your laptop:
 
-      $ git clone https://github.com/web2py/web2py.git
+      $ git clone https://github.com/web2py/web2py.git --recurse-submodules
       $ cd web2py/applications
       $ git clone https://github.com/mdipierro/evote.git
       $ cd ..
