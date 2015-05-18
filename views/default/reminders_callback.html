@@ -10,7 +10,7 @@
 {{=form}}
 
 {{if failures:}}
-<h2>{{=T('We failed email the following voters')}}</h2>
+<h2>{{=T('We failed to email the following voters')}}</h2>
 <ul>
   {{for failure in failures:}}
   <li style="color:red">{{=failure}}</li>
@@ -21,6 +21,6 @@
 <script>
   jQuery('input[type=submit]').click(function(){
     jQuery('#demo, #target form, #target a').hide();
-    jQuery('#target').append('<h2>Processing... please wait and no reload<h2><img src="{{=URL('static','images/wait.gif')}}" align="center"/>');
+    jQuery('#target').append('<h2>Processing... please wait and do not reload<h2><img src="{{=URL('static','images/wait.gif')}}" align="center"/>');
   });
 </script>
