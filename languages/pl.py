@@ -20,7 +20,7 @@
 'Ballot Id': 'Ballot Id',
 'Ballot Verification Code': 'Ballot Verification Code',
 'Ballots': 'Ballots',
-'Ballots are generated when the election starts and assign voters when their vote is recorded. The total set of ballots should not change unless the election has been tampered with by an administrator and a new ballot has been fabricated. The ballot UUID is compreised by an acutal UUID and the RSA signature of the UUID using the election private_key.': 'Ballots are generated when the election starts and assign voters when their vote is recorded. The total set of ballots should not change unless the election has been tampered with by an administrator and a new ballot has been fabricated. The ballot UUID is compreised by an acutal UUID and the RSA signature of the UUID using the election private_key.',
+'Ballots are generated when the election starts and assign voters when their vote is recorded. The total set of ballots should not change unless the election has been tampered with by an administrator and a new ballot has been fabricated. The ballot UUID is comprised of an acutal UUID and the RSA signature of the UUID using the election private_key.': 'Ballots are generated when the election starts and assign voters when their vote is recorded. The total set of ballots should not change unless the election has been tampered with by an administrator and a new ballot has been fabricated. The ballot UUID is comprised of an acutal UUID and the RSA signature of the UUID using the election private_key.',
 'BLANK': 'BLANK',
 'cache': 'cache',
 'Cannot be empty': 'Nie może być puste',
