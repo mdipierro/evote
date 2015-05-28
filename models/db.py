@@ -26,6 +26,7 @@ mail=auth.settings.mailer
 mail.settings.server = 'logging' if DEVELOPMENT else EMAIL_SERVER
 mail.settings.sender = EMAIL_SENDER
 mail.settings.login = EMAIL_LOGIN
+mail.settings.tls = EMAIL_USE_TLS
 
 ## configure auth policy
 auth.settings.registration_requires_verification = not DEVELOPMENT

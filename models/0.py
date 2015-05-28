@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-DEVELOPMENT  = False
-DBURI        = 'sqlite://storage.sqlite'
-EMAIL_SENDER = 'i.vote.secure@gmail.com'
-EMAIL_SERVER = 'logging' # 'localhost'
-EMAIL_LOGIN  = None
-GMAIL_LOGIN  = None
+DEVELOPMENT   = False
+DBURI         = 'sqlite://storage.sqlite'
+EMAIL_SENDER  = 'i.vote.secure@gmail.com'
+EMAIL_SERVER  = 'logging' # 'localhost'
+EMAIL_USE_TLS = False
+EMAIL_LOGIN   = None
+GMAIL_LOGIN   = None
 AS_SERVICE = True
 DEBUG_MODE = False
 SCHEME = 'http' or 'https' # scheme for access to voting
