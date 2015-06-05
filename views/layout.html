@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="{{=URL('static','css/bootstrap.min.css')}}"/>
     <link rel="stylesheet" href="{{=URL('static','css/bootstrap-theme.min.css')}}"/>
     <link rel="stylesheet" href="{{=URL('static','css/web2py-bootstrap3.css')}}"/>
+    <link rel="stylesheet" href="{{=URL('static','css/custom.css')}}"/>
     <link rel="shortcut icon" href="{{=URL('static','images/favicon.ico')}}" type="image/x-icon">
     <link rel="apple-touch-icon" href="{{=URL('static','images/favicon.png')}}">
     <!-- All JavaScript at the bottom, except for Modernizr which enables
@@ -75,7 +76,7 @@
     {{end}}
     <!-- Main ========================================= -->
     <!-- Begin page content -->
-    <div class="container-fluid" style="margin-top:50px">
+    <div class="container-fluid" style="padding-top:50px;padding-bottom:50px">
       
       {{if left_sidebar_enabled:}}
         <div class="col-md-3 left-sidebar">
@@ -117,6 +118,8 @@
     <!-- The javascript =============================== -->
     <script src="{{=URL('static','js/bootstrap.min.js')}}"></script>
     <script src="{{=URL('static','js/web2py-bootstrap3.js')}}"></script>
+    <script src="{{=URL('static','js/jquery-sortable.js')}}"></script>
+    <script src="{{=URL('static','js/evote.js')}}"></script>
     {{block page_js}}{{end page_js}}
     {{if response.google_analytics_id:}}
     <!-- Analytics ==================================== -->
