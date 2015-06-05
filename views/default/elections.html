@@ -2,31 +2,29 @@
 
 {{if auth.user.is_manager:}}
 <h2>Create a new election</h2>
-{{=A(T('New Election'),_href=URL('edit'),_class="btn")}}
+{{=A(T('New Election'),_href=URL('edit'),_class="btn btn-primary")}}
 {{pass}}
 
 <h1>My Elections</h1>
 
 {{if ballots:}}
 <h2>Elections requiring your vote</h2>
-<div style="width:80%">
-  <table class="table">
-    {{for ballot in ballots:}}
-    <tr>
-      <td>
-        <i class="icon-folder-close"></i>
-        {{=ballot.election.title}} ({{=ballot.election.id}})
-      </td>
-      <td>
-        Created on {{=ballot.election.created_on}}
-      </td>
-      <td>
-        <a class="btn" style="float:right" href="{{=URL('vote',args=(ballot.election.id,ballot.voter.voter_uuid))}}">Vote</a>
-      </td>
-    </tr>
-    {{pass}}
-  </table>
-</div>
+<table class="table">
+  {{for ballot in ballots:}}
+  <tr>
+    <td>
+      <i class="icon-folder-close"></i>
+      {{=ballot.election.title}} ({{=ballot.election.id}})
+    </td>
+    <td>
+      Created on {{=ballot.election.created_on}}
+    </td>
+    <td>
+      <a class="btn btn-default" style="float:right" href="{{=URL('vote',args=(ballot.election.id,ballot.voter.voter_uuid))}}">Vote</a>
+    </td>
+  </tr>
+  {{pass}}
+</table>
 {{else:}}
 <h2>No elections require your vote</h2>
 {{pass}}
@@ -34,45 +32,43 @@
 {{if elections:}}
 <h2>Elections managed by you</h2>
 
-<div style="width:80%">
-  <table class="table">
-    {{for election in elections:}}
-    <tr>
-      <td>
-        <i class="icon-folder-close"></i> {{=election.title}}
-        {{if election.deadline and election.deadline<request.now:}}
-                                             <span class="election-closed">closed</span>
-                                             {{else:}}
+<table class="table">
+  {{for election in elections:}}
+  <tr>
+    <td>
+      <i class="icon-folder-close"></i> {{=election.title}}
+      {{if election.deadline and election.deadline<request.now:}}
+                                                     <span class="election-closed">closed</span>
+                                                     {{else:}}
                                              <span class="election-open">open</span>
                                              {{pass}}
-      </td>
-      <td>
+    </td>
+    <td>
         Created on {{=election.created_on}}
         {{if election.closed:}}(closed){{pass}}
-      </td>
-      <td>    
-        <div class="btn-group" style="float:right">
-          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-	    Action
-	    <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu">
-	    {{if not election.closed:}}
-	    {{=LI(A(I(_class='icon-edit'),' ',T('Edit Election'),_href=URL('edit',args=election.id)))}}
-	    {{=LI(A(I(_class='icon-play-circle'),' ',T('Start Election'),_href=URL('start',args=election.id)))}}
-	    {{=LI(A(I(_class='icon-envelope'),' ',T('Send Reminder'),_href=URL('reminders',args=election.id)))}}
-	    {{=LI(A(I(_class='icon-off'),' ',T('Close Election'),_href=URL('close_election',args=election.id)))}}
-	    {{pass}}
-	    {{=LI(A(I(_class='icon-folder-open'),' ',T('Ballots'),_href=URL('ballots',args=election.id)))}}
-	    {{=LI(A(I(_class='icon-list'),' ',T('Results'),_href=URL('results',args=election.id)))}}
+    </td>
+    <td>    
+      <div class="btn-group" style="float:right">
+        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+	  Action
+	  <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+	  {{if not election.closed:}}
+	  {{=LI(A(I(_class='icon-edit'),' ',T('Edit Election'),_href=URL('edit',args=election.id)))}}
+	  {{=LI(A(I(_class='icon-play-circle'),' ',T('Start Election'),_href=URL('start',args=election.id)))}}
+	  {{=LI(A(I(_class='icon-envelope'),' ',T('Send Reminder'),_href=URL('reminders',args=election.id)))}}
+	  {{=LI(A(I(_class='icon-off'),' ',T('Close Election'),_href=URL('close_election',args=election.id)))}}
+	  {{pass}}
+	  {{=LI(A(I(_class='icon-folder-open'),' ',T('Ballots'),_href=URL('ballots',args=election.id)))}}
+	  {{=LI(A(I(_class='icon-list'),' ',T('Results'),_href=URL('results',args=election.id)))}}
 	    {{=LI(A(I(_class='icon-download'),' ',T('CSV Voters'),_href=URL('voters_csv.csv',args=election.id)))}}
-          </ul>
-        </div>
-      </td>
-    </tr>
-    {{pass}}
-  </table>
-</div>
+        </ul>
+      </div>
+    </td>
+  </tr>
+  {{pass}}
+</table>
 {{else:}}
 <h2>There are no elections managed by you</h2>
 {{pass}}

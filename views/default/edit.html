@@ -38,8 +38,6 @@ response.files.append(URL('static','cleditor/jquery.cleditor.table.min.js'))
       </a>
     </td>
   </tr>
-</table>
-<table class="advanced" width="100%">
   <tr>
     <td colspan="2"><h3>{{=T('Text of email with voting link')}}</h3>
       {{=form.custom.widget.vote_email}}</td>
@@ -62,15 +60,17 @@ response.files.append(URL('static','cleditor/jquery.cleditor.table.min.js'))
   </tr>
   {{pass}}  
 </table>
-{{=form.custom.submit}}
-{{=form.custom.end}}
+<div style="padding-top:30px">
+  {{=form.custom.submit}}
+  {{=form.custom.end}}
+</div>
 
 
 <script type="text/javascript">
 jQuery(function() {
   jQuery("#election_ballot_model").cleditor({width: '100%'})[0].focus();
-  jQuery("#election_voters").css({width:'300px'});
-  jQuery("#election_managers").css({width:'300px'});
+  jQuery("#election_voters").css({width:'90%'});
+  jQuery("#election_managers").css({width:'90%'});
   jQuery(".advanced").hide();
   jQuery("input[type=submit]").addClass('btn btn-primary');
 });
