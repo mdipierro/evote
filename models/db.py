@@ -73,7 +73,7 @@ mail.settings.sender = myconf.take('smtp.sender')
 mail.settings.login = myconf.take('smtp.login')
 
 ## configure auth policy
-auth.settings.registration_requires_verification = False
+auth.settings.registration_requires_verification = not DEVELOPMENT
 auth.settings.registration_requires_approval = False
 auth.settings.reset_password_requires_verification = True
 
