@@ -54,6 +54,7 @@ def start_callback():
     if form.process().accepted:
         ballot_counter = db(db.ballot.election_id==election.id).count()
         for email in regex_email.findall(election.voters):
+            email = email.lower()
             voter = db(db.voter.election_id==election.id)\
                 (db.voter.email==email).select().first()
             if voter:
@@ -91,7 +92,8 @@ def start_callback():
         db.commit()
         sender = election.email_sender or mail.settings.sender
         for voter, to, subject, message in emails:
-            if mail.send(to=to,subject=subject,message=message):
+            if meta_send2(to=to,subject=subject,message=message,
+                          sender=sender, reply_to=sender):
                 db(db.voter.id==voter).update(invited_on=request.now)
             else:
                 failures.append(to)
@@ -125,7 +127,9 @@ def self_service():
                                       link_ballots=link_ballots,
                                       link_results=link_results)
             sender = election.email_sender or mail.settings.sender
-            if mail.send(to=voter.email,subject=election.title,message=message):
+            if meta_send2(to=voter.email,subject=election.title,
+                          message=message,
+                          sender=sender, reply_to=sender):
                 response.flash = T('Email sent')
             else:
                 response.flash = T('Unable to send email')
@@ -169,7 +173,8 @@ def reminders_callback():
     if form.accepted:
         sender = election.email_sender or mail.settings.sender
         for to, subject, message in emails:
-            if not mail.send(to=to,subject=subject,message=message):
+            if not meta_send2(to=to,subject=subject,message=message,
+                              sender=sender, reply_to=sender):
                 failures.append(email)
         if not failures:
             session.flash = T('Emails sent successfully')
@@ -280,19 +285,21 @@ def ballots():
                        for b in ballots if b.voted))>1
     return dict(ballots=ballots,election=election, tampered=tampered)
 
-#@auth.requires(auth.user and auth.user.is_manager)
+@auth.requires(auth.user and auth.user.is_manager)
 def email_voter_and_managers(election,voter,ballot,message):
     import cStringIO
     attachment = mail.Attachment(
         filename=ballot.ballot_uuid+'.html',
         payload=cStringIO.StringIO(ballot.ballot_content))
     sender = election.email_sender or mail.settings.sender
-    ret = mail.send(to=voter.email,
+    ret = meta_send(to=voter.email,
                     subject='Receipt for %s' % election.title,
-                    message=message,attachments=[attachment])
-    mail.send(to=regex_email.findall(election.managers),
+                    message=message,attachments=[attachment],
+                    sender=sender, reply_to=sender)
+    meta_send(to=regex_email.findall(election.managers),
               subject='Copy of Receipt for %s' % election.title,
-              message=message,attachments=[attachment])
+              message=message,attachments=[attachment],
+              sender=sender, reply_to=sender)
     return ret
 
 def check_closed(election):
@@ -426,10 +433,6 @@ def vote():
     return dict(form=form)
 
 def user():
-    if USERS_FILENAME:
-        auth.settings.register_onvalidation = lambda form: \
-            form.vars.email not in users_emails and \
-            form.errors.update({'email':T('Not Authorized')})
     return dict(form=auth())
 
 def invalid_link():

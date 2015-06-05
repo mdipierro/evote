@@ -1,10 +1,18 @@
 {{extend 'layout.html'}}
 
+{{block header}}
+<header class="container-fluid background">
+  <div class="jumbotron text-center">
+    {{if response.title:}}
+    <h1>{{=response.title}}</h1>
+    {{pass}}
+  </div>
+</header>
+{{end}}
+
 <center>
 <h1>Free Secure Trusted Verifiable Online Voting</h1>
 </center>
-
-<div style="height:50px"></div>
 
 <div class="row show-grid hero-list features-list">
   <div class="span3">

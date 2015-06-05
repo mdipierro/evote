@@ -37,3 +37,18 @@ db.define_table(
     Field('ballot_uuid'), # uuid embedded in ballot
     Field('signature')) # signature of ballot (voted or blank)
 
+
+# if resticted to some users get the list of users
+def load_users_emails(filename=myconf.take('app.users_filename')):
+    import urllib, os
+    if not filename:
+        return None
+    elif filename.startswith('http://') or filename.startswith('https://'):
+        emails = urllib.urlopen(filename).read().split('\n')
+    else:
+        if not filename.startswith('/'):
+            filename = os.path.join(request.folder, filename)
+        emails = open(filename).read().split('\n')
+    emails = [email.strip() for email in emails if email.strip()]
+    return emails
+users_emails = cache.ram('users_emails',load_users_emails,3600)

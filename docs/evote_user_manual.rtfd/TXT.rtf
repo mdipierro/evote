@@ -1,0 +1,377 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
+{\fonttbl\f0\fswiss\fcharset0 Arial-Black;\f1\fswiss\fcharset0 ArialMT;\f2\fnil\fcharset0 Georgia;
+\f3\fnil\fcharset0 Monaco;\f4\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red255\green0\blue0;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
+\margl1011\margr1011\margb1445\margt1011\vieww14000\viewh16000\viewkind1\viewscale132
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\fi722\sl288\slmult1\pardirnatural
+
+\f0\b\fs74 \cf0 eVote Tutorial\
+
+\f1\b0\fs24 by Massimo Di Pierro
+\f0\b\fs74 \
+
+\f2\b0\fs24 \
+
+\f1\b\fs28 \cf2 Installation and Configuration
+\f2\b0\fs24 \
+\cf0 \
+\pard\pardeftab720
+
+\f1 \cf0 Download web2py:\
+
+\f2 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\fi722\sl288\slmult1\pardirnatural
+
+\f3\fs20 \cf0 $ git clone https://github.com/web2py/web2py.git\
+$ cd web2py\
+$ git checkout R-2.6.4\
+$ cp handlers/wsgihandler.py ./\
+\pard\pardeftab720
+\cf0 \
+
+\f1\fs24 Remove unwanted apps\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\fi722\sl288\slmult1\pardirnatural
+
+\f3\fs20 \cf0 $ rm -r applications/examples\
+\pard\pardeftab720
+\cf0 \
+
+\f1\fs24 Download eVote:\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\fi722\sl288\slmult1\pardirnatural
+
+\f3\fs20 \cf0 $ git clone https://github.com/mdipierro/evote.git applications/evote\
+$ cd applications/evote\
+$ cd ../..\
+\pard\pardeftab720
+\cf0 \
+
+\f1\fs24 Start web2py using the built-in web server\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\fi722\sl288\slmult1\pardirnatural
+
+\f3\fs20 \cf0 $ pyhton web2py.py\
+\
+\pard\pardeftab720
+
+\f1\fs24 \cf0 or start it using gunicorn
+\f3\fs20 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\fi722\sl288\slmult1\pardirnatural
+\cf0 \
+$ python anyserver.py -s gunicorn -i 0.0.0.0 -p 8000 -w 4\
+\
+\pard\pardeftab720
+
+\f1\fs24 \cf0 Configure eVote\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\fi722\sl288\slmult1\pardirnatural
+
+\f3\fs20 \cf0 $ emacs applications/init/models/0.py\
+DEVELOPMENT  = False\
+DBURI        = 'sqlite://storage.sqlite'\
+EMAIL_SENDER = 'i.vote.secure@gmail.com'\
+EMAIL_SERVER = 'localhost'\
+EMAIL_LOGIN  = None\
+GMAIL_LOGIN  = None\
+AS_SERVICE = True\
+DEBUG_MODE = False\
+SCHEME = 'http' or 'https' # scheme for access to voting                        \
+USERS_FILENAME = None\
+\
+\pard\pardeftab720
+
+\f1\fs24 \cf0 To restrict access so that only some users can register and create elections change:\
+
+\f3\fs20 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\fi722\sl288\slmult1\pardirnatural
+\cf0 AS_SERVICE = True\
+USERS_FILENAME = None\
+\pard\pardeftab720
+\cf0 \
+
+\f1\fs24 with:\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\fi722\sl288\slmult1\pardirnatural
+
+\f3\fs20 \cf0 AS_SERVICE = False\
+USERS_FILENAME = \'93/path/to/emails.txt\'94\
+\pard\pardeftab720
+\cf0 \
+
+\f1\fs24 where \'93/path/to/emails.txt\'94 is a file you must create which contains a list of emails of users who can create elections. One email per line.\
+\
+Notice USERS_FILENAME can also be a URL. In that case eVote will download the file from the URL. Notice that the list of emails is cached and only refreshed every hour.\
+\
+You also need to configure the email:\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\fi722\sl288\slmult1\pardirnatural
+
+\f3\fs20 \cf0 EMAIL_SENDER = 'i.vote.secure@gmail.com'\
+EMAIL_SERVER = 'localhost' # any SMPT server\
+EMAIL_LOGIN  = None # \'93username:password\'94\
+\
+\pard\pardeftab720
+
+\f1\fs24 \cf0 For security you may want to restrict eVote to use https:\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\fi722\sl288\slmult1\pardirnatural
+
+\f3\fs20 \cf0 SCHEME = 'https\'92
+\f1\fs24 \
+\pard\pardeftab720
+\cf0 \
+In this case you also have to configure the web server to use HTTPS. For the case of the built-in web2py server refer to the online documentation.\
+\
+Optionally you may want to redirect (using the web server or using routes.py):\
+\
+	http://hostname:port/ to http://hostname:port/evote\
+
+\f3\fs20 \
+
+\f1\fs24 At this point eVote is configure and running.\
+
+\f3\fs20 \
+\
+\
+\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\fi722\sl288\slmult1\pardirnatural
+
+\f1\b\fs28 \cf2 Running eVote\
+
+\f2\b0\fs24 \cf0 \
+\pard\pardeftab720
+
+\f1 \cf0 Visit the eVote URL: http://hostname/evote
+\f3\fs20 \
+\
+\pard\pardeftab720
+
+\f4\fs24 \cf0 {{\NeXTGraphic Pasted Graphic.tiff \width20700 \height13180
+}¬}
+\f3\fs20 \
+\page 
+\f1\fs24 Click on [register] and register:\
+
+\f3\fs20 \
+\pard\pardeftab720
+
+\f4\fs24 \cf0 {{\NeXTGraphic Pasted Graphic 1.tiff \width20700 \height13180
+}¬}\pard\pardeftab720
+
+\f1 \cf0 \
+\
+The newly registered user will receive an email with a link. Click on the link to verify the email. Then login.\
+\page Upon login you will see your username on the top-right: \'93welcome Agent\'94!\
+\pard\pardeftab720
+
+\f3\fs20 \cf0 \
+\pard\pardeftab720
+
+\f4\fs24 \cf0 {{\NeXTGraphic Pasted Graphic 2.tiff \width20700 \height13180
+}¬}\pard\pardeftab720
+
+\f3\fs20 \cf0 \
+
+\f1\fs24 \page Click on the [elections] menu tab to create a new election:\
+
+\f3\fs20 \
+\pard\pardeftab720
+
+\f4\fs24 \cf0 {{\NeXTGraphic Pasted Graphic 3.tiff \width20700 \height13180
+}¬}\pard\pardeftab720
+
+\f3\fs20 \cf0 \
+\pard\pardeftab720
+
+\f1\fs24 \cf0 \page A new election has many parameters:\
+- a title\
+- a ballot (it contains the options and text)\
+- emails of voters\
+- emails of managers (they will receive anonymized copies of voted ballots for recount)\
+- a deadline\
+- additional text to be used in email communications\
+- an id (assigned automatically after creation)\
+\
+\pard\pardeftab720
+
+\f4 \cf0 {{\NeXTGraphic Pasted Graphic 4.tiff \width20700 \height13180
+}¬}\pard\pardeftab720
+
+\f3\fs20 \cf0 \
+
+\f1\fs24 \
+\page Scroll down for more options...\
+\
+\pard\pardeftab720
+
+\f4 \cf0 {{\NeXTGraphic Pasted Graphic 5.tiff \width20700 \height13180
+}¬}\pard\pardeftab720
+
+\f3\fs20 \cf0 \
+
+\f1\fs24 \page Click [more options] for yet more option.\
+\
+\pard\pardeftab720
+
+\f4 \cf0 {{\NeXTGraphic Pasted Graphic 6.tiff \width20700 \height13180
+}¬}\pard\pardeftab720
+
+\f3\fs20 \cf0 \
+
+\f1\fs24 \page Types of elections.\
+\
+A ballot can contain can many groups of radio boxes. Each group has a name. \
+\
+The simplest way to create a group is:\
+\
+\{\{x\}\} First Candiate \{\{x\}\} Second Candidate \{\{x\}\} Third Candidate\
+\
+The repeated \{\{x\}\} will be rendered as three radio boxes. \'93x\'94 is the name of this group. The name can be any alphanumeric sequence. If the name is followed by a \'93!\'94, that is interpreted as a pre-selected default option.\
+\
+\{\{x!\}\} First Candiate \{\{x\}\} Second Candidate \{\{x\}\} Third Candidate\
+\
+You can create multiple groups using for example:\
+\
+First Candidate \{\{x\}\} yes \{\{x\}\} no\
+Second Candidate \{\{y\}\} yes \{\{y\}\} no\
+Third Candidate \{\{z\}\} yes \{\{z\}\} no\
+\
+For each (\'91x\'92,\'92y\'92,\'92z\'92) evote will count the first selection (yes) and the second selection (no).\
+\
+eVote also allows ranking (using different schemes). This is experimental. In this case you make an unordered list:\
+\
+\pard\tx220\tx720\pardeftab720\li720\fi-720
+\ls1\ilvl0
+\fs26 \cf0 {\listtext	\'95	}\{\{x:ranking\}\} First Candidate\
+{\listtext	\'95	}\{\{x:ranking\}\} Second Candidate\
+{\listtext	\'95	}\{\{x:ranking\}\} Third Candidate\
+\pard\pardeftab720
+
+\fs24 \cf0 \
+Here \'93x\'94 is the election name, \'93ranking\'94 is a keyword which instructs evote to turn the list item into a sortable list. The voter can sort the list with the mouse.\
+\page Once the election has been created, you click [submit] and you will see a sample ballot page.\
+\
+\pard\pardeftab720
+
+\f4 \cf0 {{\NeXTGraphic Pasted Graphic 7.tiff \width20700 \height13180
+}¬}\pard\pardeftab720
+
+\f3\fs20 \cf0 \
+
+\f1\fs24 \
+If you like it press [Email Voters and Start Election Now] else go back end edit it.\
+\
+\page You can always manage all your elections in one place:\
+
+\f3\fs20 \
+\pard\pardeftab720
+
+\f4\fs24 \cf0 {{\NeXTGraphic Pasted Graphic 9.tiff \width20700 \height13180
+}¬}\pard\pardeftab720
+
+\f3\fs20 \cf0 \
+
+\f1\fs24 \page For each election click on [ballots] to see the empty ballots which have need created. BLANK means the ballot does not contain a vote yet.\
+\
+
+\f4 {{\NeXTGraphic Pasted Graphic 10.tiff \width20700 \height13180
+}¬}
+\f3\fs20 \
+
+\f1\fs24 \page \pard\pardeftab720
+\cf0 When you start the election, each voter receives an email like this:\
+
+\f3\fs20 \
+	From: i.vote.secure@gmail.com\
+	To: other.voter1@example.com\
+	Subject: Election title [1]\
+\
+	Election N.1 by agent.smith@example.com\
+\
+	Election title\
+\
+	Link to vote: http://127.0.0.1:8000/evote/default/vote/1/voter-848DCA6F0...\
+	Link to ballots: http://127.0.0.1:8000/evote/default/ballots/1\
+	Link to results: http://127.0.0.1:8000/evote/default/results/1\
+\
+
+\f1\fs24 The voter only needs to click on the link to vote. Upon clicking a random BLANK ballot is presented to the voter.\
+\
+\cf3 ATTENTION! The system assumes the voter does receive the email!\
+
+\f3\fs20 \cf0 \
+\pard\pardeftab720
+
+\f4\fs24 \cf0 {{\NeXTGraphic Pasted Graphic 11.tiff \width20700 \height13180
+}¬}\pard\pardeftab720
+
+\f3\fs20 \cf0 \
+\pard\pardeftab720
+
+\f1\fs24 \cf0 \page \pard\pardeftab720
+\cf0 Upon voting the vote is recorded (linked to the ballot, not to the voter, thus anonymous) and the voter is presented with an acknowledgement pagen. The same content is also emailed to the voter as receipt and a copy is sent to the managers (anonymized) for verification.\
+
+\f3\fs20 \
+\pard\pardeftab720
+
+\f4\fs24 \cf0 {{\NeXTGraphic Pasted Graphic 12.tiff \width20700 \height13180
+}¬}
+\f3\fs20 \
+
+\f1\fs24 \page \pard\pardeftab720
+\cf0 When a vote is cast, it is shown in the ballots page. This page is public to show that no new ballots are added or deleted. The actual ballots only become public when the election is closed.\
+
+\f3\fs20 \
+\pard\pardeftab720
+
+\f4\fs24 \cf0 {{\NeXTGraphic Pasted Graphic 13.tiff \width20700 \height13180
+}¬}
+\f3\fs20 \
+
+\f1\fs24 \page \pard\pardeftab720
+\cf0 The manager can use the election page to prematurely close an election or send additional reminders to voters:\
+
+\f3\fs20 \
+\pard\pardeftab720
+
+\f4\fs24 \cf0 {{\NeXTGraphic 1__#$!@%!#__Pasted Graphic 9.tiff \width20700 \height13180
+}¬}\pard\pardeftab720
+
+\f3\fs20 \cf0 \
+\pard\pardeftab720
+
+\f1\fs24 \cf0 \page \pard\pardeftab720
+\cf0 When an election is closed the radio boxes in each group are counted and results are shown publicly as follows:\
+
+\f3\fs20 \
+\pard\pardeftab720
+
+\f4\fs24 \cf0 {{\NeXTGraphic Pasted Graphic 14.tiff \width20700 \height13180
+}¬}\pard\pardeftab720
+
+\f3\fs20 \cf0 \
+\
+\
+
+\f1\fs24 The boxes replace the radio boxes and show counts of clicks.\
+\
+For ranking elections the boxes show different types of ranking results labeled as M, I, and S.\
+\
+- M stands for \'93Simple Majority using the exponential Borda algorithm\'94 (higher is better)\
+- I stands for \'93Instant Run-Off\'94 (higher is better)\
+- S stands for \'93Schultze\'94 (higher is better)\
+\
+In the example Candidate A won according to two of the three counting algorithms.\
+\
+The details of the ranking algorithms with tests are here:\
+\
+     https://github.com/mdipierro/evote/blob/master/modules/ranking_algorithms.py\
+\
+Yet this part of eVote is to be considered experimental.
+\f3\fs20 \
+}
