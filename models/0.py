@@ -8,7 +8,7 @@ EMAIL_LOGIN   = None
 GMAIL_LOGIN   = None
 AS_SERVICE = True
 DEBUG_MODE = False
-SCHEME = 'http' or 'https' # scheme for access to voting
+SCHEME = 'http' if DEVELOPMENT else 'https' 
 USERS_FILENAME = None
 
 response.title = 'E-Vote'

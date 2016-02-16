@@ -10,7 +10,7 @@ except:
     have_ast=False
 
 regex_field = re.compile('{{(\w+)(\:\w+)?\!?}}')
-regex_email = re.compile('[^\s<>"\',;]+\@[^\s<>"\',;\+',re.IGNORECASE)
+regex_email = re.compile('''^((?!\.)(?:[-a-z0-9!\#$%&'*+/=?^_`{|}~]|(?<!\.)\.)+(?<!\.)@(?:localhost|(?:[a-z0-9](?:[-\w]*[a-z0-9])?\.)+[a-z]{2,}))$''', re.IGNORECASE)
 
 def uuid():
     return str(uuid4()).replace('-','').upper()

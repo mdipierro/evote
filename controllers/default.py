@@ -2,6 +2,7 @@ from ballot import ballot2form, form2ballot, blank_ballot, \
     sign, uuid, regex_email, unpack_results, rsakeys, \
     pack_counters, unpack_counters
 from ranking_algorithms import iro, borda, schulze
+import re
 
 def index():
     return dict()
@@ -285,7 +286,7 @@ def ballots():
                        for b in ballots if b.voted))>1
     return dict(ballots=ballots,election=election, tampered=tampered)
 
-@auth.requires(auth.user and auth.user.is_manager)
+# @auth.requires(auth.user and auth.user.is_manager)
 def email_voter_and_managers(election,voter,ballot,message):
     import cStringIO
     attachment = mail.Attachment(
@@ -306,7 +307,6 @@ def check_closed(election):
     if election.closed:
         session.flash = T('Election already closed')
         redirect(URL('elections'))
-
 
 @auth.requires(auth.user and auth.user.is_manager)
 def close_election():
@@ -371,9 +371,13 @@ def ballot():
         or redirect(URL('invalid_link'))
     if (not election.deadline or election.deadline>request.now) \
             and ballot.signature!=signature:
-        redirect(URL('not_authorized'))
+        session.flash = "your ballot is not visible until election is closed"
+        redirect(URL('index'))
     response.subtitle = election.title + T(' / Ballot')
     return dict(ballot=ballot,election=election)
+
+def recorded():
+    return dict()
 
 def ballot_verifier():
     response.headers['Content-Type'] = 'text/plain'
@@ -429,7 +433,7 @@ def vote():
             T('Your vote was recorded and we sent you an email') \
             if emailed else \
             T('Your vote was recorded but we failed to email you')
-        redirect(link)
+        redirect(URL('recorded',vars=dict(link=link)))
     return dict(form=form)
 
 def user():
