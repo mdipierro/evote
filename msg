@@ -1,1 +1,0 @@
-Fixed Borda and input to ranking alg, working on iros

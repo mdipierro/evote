@@ -1,12 +1,18 @@
 {{extend 'layout.html'}}
 
-{{=LOAD('default','start_callback',args=election.id,ajax=True,target='target')}}
+<div class="container max900">
+  <div class="fill">
+    <div class="padded">
+      {{=LOAD('default','start_callback',args=election.id,ajax=True,target='target')}}
 
-<div id="demo">
+      <div id="demo">
 
-<h2 style="color:red">{{=T('Test Ballot (not actual voting ballot)')}}</h2>
+        <h4 style="color:red">{{=T('Test Ballot (not actual voting ballot)')}}</h4>
 
-{{=demo}}
-
+        {{=demo}}
+        
+      </div>
+    </div>
+  </div>
 </div>
 

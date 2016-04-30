@@ -1,6 +1,10 @@
 {{extend 'layout.html'}}
 
-<center>
-  <h1>Your vote was recorded. Done!</h1>
-  Link to your ballot <a href="{{=request.vars.link}}">{{=request.vars.link}}</a>
-</center>
+<div class="container max900">
+  <div class="fill">
+    <div class="padded center">
+      <h2>Your vote was recorded. Done!</h2>
+      <a href="{{=request.vars.link}}">Link to your ballot</a>
+    </div>
+  </div>
+</div>

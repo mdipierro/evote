@@ -1,6 +1,11 @@
 {{extend 'layout.html'}}
 
-<h1>{{=T('Resend voting link to voters')}}</h1>
+<div class="container max900">
+  <div class="fill">
+    <div class="padded">
+      <h2>{{=T('Resend voting link to voters')}}</h2>
 
-{{=LOAD('default','reminders_callback',args=election.id,ajax=True,target='target')}}
-
+      {{=LOAD('default','reminders_callback',args=election.id,ajax=True,target='target')}}
+    </div>
+  </div>
+</div>

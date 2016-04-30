@@ -23,9 +23,10 @@ response.google_analytics_id = myconf.take('app.google_analytics_id')
 #########################################################################
 
 response.menu = [
-    (T('Home'), False, URL('default', 'index')),
+    (T('EVote'), False, URL('default', 'index')),
     (T('Elections'), False, URL('default', 'elections')),
     (T('Features'), False, URL('default', 'features')),
     (T('Support'), False, URL('default', 'support')),
+    (T('Source Code'), False, 'https://github.com/mdipierro/evote'),
 ]
 

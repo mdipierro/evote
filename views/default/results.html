@@ -1,11 +1,16 @@
 {{extend 'layout.html'}}
 
-<h2>Results for election #{{=election.id}} "{{=election.title}}" </h2>
+<div class="container max900">
+  <div class="fill">
+    <div class="padded">
+      <h3>Results for election #{{=election.id}} "{{=election.title}}" </h3>
 
-{{=form}}
-
-<p>{{=T('Election is completely re-counted every time this page is visited. You can see the individual ballots which have been counted and their associated tokens here')}}</p>
-
-{{=A(T('Ballots'),_href=URL('ballots',args=election.id),_class="btn")}}
-
+      {{=form}}
+      
+      <p>{{=T('Election is completely re-counted every time this page is visited. You can see the individual ballots which have been counted and their associated tokens here')}}</p>
+      
+      {{=A(T('Ballots'),_href=URL('ballots',args=election.id),_class="btn")}}
+    </div>
+  </div>
+</div>
 

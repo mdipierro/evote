@@ -1,39 +1,44 @@
 {{extend 'layout.html'}}
 
-{{block header}}
-<header class="container-fluid background">
-  <div class="jumbotron text-center">
+<div class="container max900">
+  <div class="fill center spaced">
+    <h3>Free Secure Trusted Verifiable Online Voting</h3>
   </div>
-</header>
-{{end}}
+</div>
+<div class="container max900">
+  <div class="quarter">
+    <div class="padded">
+      <strong>Easy to Use</strong>
+      <p style="text-align:left; line-height:1.5em">You can create one or many polls/elections per ballot. Simple Counting, Instant Run-Off, and Schulze Algorithms.
+        <a href="{{=URL('features')}}">Learn more&nbsp;&raquo;</a>
+      </p>
+    </div>
+  </div>
+  
+  <div class="quarter">
+    <div class="padded">
+      <strong>Security Engine</strong>
+      <p style="text-align:left; line-height:1.5em">We run the polls/elections online in an anonymous and verifiable manner using the latest security technologies.
+    <a href="{{=URL('features')}}">Learn more&nbsp;&raquo;</a>
+      </p>
+    </div>
+  </div>
 
-<center>
-  <h1>Free Secure Trusted Verifiable Online Voting</h1>
-</center>
+  <div class="quarter">
+    <div class="padded">
+      <strong>Email Notifications</strong>
+      <p style="text-align:left; line-height:1.5em">Voting links, reminders, receipts, and notifications are sent by emails. 
+        <a href="{{=URL('features')}}">Learn more&nbsp;&raquo;</a>
+      </p>
+    </div>
+  </div>
 
-<div class="row show-grid hero-list features-list">
-  <div class="col-xs-6 col-md-3">
-    <h3>Easy to Use</h3>
-    <p>You can create one or many polls/elections per ballot. Simple Counting, Instant Run-Off, and Schulze Algorithms.
-      <a href="{{=URL('features')}}">Learn more&nbsp;&raquo;</a>
-    </p>
-  </div>
-  <div class="col-xs-6 col-md-3">
-    <h3>Security Engine</h3>
-    <p>We run the polls/elections online in an anonymous and verifiable manner using the latest security technologies.
-      <a href="{{=URL('features')}}">Learn more&nbsp;&raquo;</a>
-    </p>
-                </div>
-  <div class="col-xs-6 col-md-3">
-    <h3>Email Notifications</h3>
-    <p>Voting links, reminders, receipts, and notifications are sent by emails. 
-      <a href="{{=URL('features')}}">Learn more&nbsp;&raquo;</a>
-    </p>
-  </div>
-  <div class="col-xs-6 col-md-3">
-    <h3>Quick Interaction</h3>
-    <p>One click actions make the voting process simple without need to create accounts or navigate multiple pages.
-      <a href="{{=URL('features')}}">Learn more&nbsp;&raquo;</a>
-    </p>
+  <div class="quarter">
+    <div class="padded">
+      <strong>Quick Interaction</strong>
+      <p style="text-align:left; line-height:1.5em">One click actions make the voting process simple without need to create accounts or navigate multiple pages.
+        <a href="{{=URL('features')}}">Learn more&nbsp;&raquo;</a>
+      </p>
+    </div>
   </div>
 </div>

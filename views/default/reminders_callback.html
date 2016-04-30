@@ -4,13 +4,13 @@
 <button class="btn" onclick="jQuery('form').find(':checkbox').attr('checked', 'checked')">Check all</button>
 <button class="btn" onclick="jQuery('form').find(':checkbox').attr('checked', false)">Uncheck all</button>
 
-<h2>{{=T('Voters who have not yet voted')}}</h2>
+<h4>{{=T('Voters who have not yet voted')}}</h4>
 
 {{form.element('input[type=submit]').add_class('btn btn-primary')}}
 {{=form}}
 
 {{if failures:}}
-<h2>{{=T('We failed to email the following voters')}}</h2>
+<h4>{{=T('We failed to email the following voters')}}</h4>
 <ul>
   {{for failure in failures:}}
   <li style="color:red">{{=failure}}</li>
@@ -21,6 +21,6 @@
 <script>
   jQuery('input[type=submit]').click(function(){
     jQuery('#demo, #target form, #target a').hide();
-    jQuery('#target').append('<h2>Processing... please wait and do not reload<h2><img src="{{=URL('static','images/wait.gif')}}" align="center"/>');
+    jQuery('#target').append('<h4>Processing... please wait and do not reload<h4><img src="{{=URL('static','images/wait.gif')}}" align="center"/>');
   });
 </script>

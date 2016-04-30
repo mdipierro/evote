@@ -1,14 +1,20 @@
 {{extend 'layout.html'}}
 
-{{=XML(ballot.ballot_content)}}
+<div class="container max900">
+  <div class="fill">
+    <div class="padded">
 
-<pre>
-{{=ballot.signature}}
-</pre>
-
-<p>{{=T('The signature is an RSA digital signature generated from the ballot content and the election private_key')}}</p>
-
-{{=A(T('Election Results'),_href=URL('results',args=ballot.election_id),_class="btn")}}
-{{=A(T('Ballots'),_href=URL('ballots',args=ballot.election_id),_class="btn")}}
-{{=A(T('Ballot Verification Code'),_href=URL('ballot_verifier.py',args=request.args),_class="btn")}}
-
+      {{=XML(ballot.ballot_content)}}
+      
+      <pre>
+        {{=ballot.signature}}
+      </pre>
+      
+      <p>{{=T('The signature is an RSA digital signature generated from the ballot content and the election private_key')}}</p>
+      
+      {{=A(T('Election Results'),_href=URL('results',args=ballot.election_id),_class="btn")}}
+      {{=A(T('Ballots'),_href=URL('ballots',args=ballot.election_id),_class="btn")}}
+      {{=A(T('Ballot Verification Code'),_href=URL('ballot_verifier.py',args=request.args),_class="btn")}}
+    </div>
+  </div>
+</div>
