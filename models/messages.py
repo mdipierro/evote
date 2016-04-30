@@ -77,10 +77,7 @@ def meta_send(*args, **kwargs):
 
 def meta_send2(to,message,reply_to,subject,sender=None):
     import smtplib
-    if sender == myconf.take('smtp.sender'):
-        mail.settings.server = myconf.take('smtp.server')
-        mail.settings.login = myconf.take('smtp.login')
-    fromaddr = sender or mail.settings.sender
+    fromaddr = mail.settings.sender
     msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\nReply-to: %s\r\n\r\n%s" \
         % (fromaddr, to, subject, reply_to, message)
     try:
