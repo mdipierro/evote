@@ -262,7 +262,8 @@ def results():
         session.flash = T('Results not yet available')
         redirect(URL('index'))
     response.subtitle = election.title + T(' / Results')
-    if DEBUG_MODE or not election.counters:
+    if (DEBUG_MODE or not election.counters or
+        not election.deadline or request.now<=election.deadline):
         compute_results(election)
     form = ballot2form(election.ballot_model,
                        counters=unpack_counters(election.counters))
