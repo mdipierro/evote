@@ -80,6 +80,9 @@ def meta_send2(to,message,reply_to,subject,sender=None):
     fromaddr = mail.settings.sender
     msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\nReply-to: %s\r\n\r\n%s" \
         % (fromaddr, to, subject, reply_to, message)
+    if mail.settings.server=='logging':
+        print msg
+        return True
     try:
         server = None
         server = smtplib.SMTP(mail.settings.server,timeout=5)

@@ -1,6 +1,5 @@
 from ballot import ballot2form, form2ballot, blank_ballot, \
-    sign, uuid, regex_email, unpack_results, rsakeys, \
-    pack_counters, unpack_counters
+    sign, uuid, regex_email, rsakeys
 from ranking_algorithms import iro, borda, schulze
 import re
 
@@ -109,7 +108,7 @@ def self_service():
     form = SQLFORM.factory(
         Field('election_id','integer',requires=IS_NOT_EMPTY()),
         Field('email',requires=IS_EMAIL()))
-    if form.process.accepted():
+    if form.process().accepted:
         election = db.election(form.vars.id)
         if not election: form.errors['election_id'] = 'Invalid'
         voter = db.voter(election=election_id,email=form.vars.email)
@@ -189,22 +188,25 @@ def recompute_results():
     redirect(URL('results',args=election.id))
 
 def compute_results(election):
-    voted_ballots = db(db.ballot.election_id==election.id
-                       )(db.ballot.voted==True).select()
+    query = db.ballot.election_id==election.id
+    voted_ballots = db(query)(db.ballot.voted==True).select()
     counters = {}
     rankers = {}
-    for k,ballot in enumerate(voted_ballots):
-        results = unpack_results(ballot.results)
-        for key in results:
+    for k,ballot in enumerate(voted_ballots):        
+        for name in ballot.results:
             # name is the name of a group as in {{name:ranking}}
             # scheme is "ranking" or "checkbox" (default)
             # value is the <input value="value"> assigned to this checkbox or input
-            (name,scheme,value) = key 
-            if scheme == 'checkbox':
+
+            # INPORTANT ONLY SUPPORT SIMPLE MAJORITY
+            key = name +'/simple-majority/' + ballot.results[name]
+            (name,scheme,value) = key.split('/',3)
+            if scheme == 'simple-majority':
                 # counters[key] counts how many times this checkbox was checked
-                counters[key] = counters.get(key,0) + (
-                    1 if results[key] else 0)                
+                counters[key] = counters.get(key,0) + 1
+                    
             elif scheme == 'ranking':
+                raise NotImplementedError
                 # rankers[name] = [[2,1,3],[3,1,2],[1,2,3],...]
                 #                 The sublists in rankers mean:
                 #                 [[my first-preferred candidate is
@@ -240,18 +242,22 @@ def compute_results(election):
                 vote[ranking-1] = value
             else:
                 raise RuntimeError("Invalid Voting Scheme")    
+
     for name in rankers:
         votes = rankers[name]
         cmajority = borda(votes,mode='exponential')
         ciro = iro(votes)
         cschulze = schulze(votes)
+        key = name+'/simple-majority/'+k
         for (r,k) in cmajority:
-            counters[(name,'ranking',k)] = 'M:%s' % r
+            counters[key] = 'M:%s' % r
         for (r,k) in ciro:
-            counters[(name,'ranking',k)] += ' I:%s' % r
+            counters[key] += ' I:%s' % r
         for (r,k) in cschulze:
-            counters[(name,'ranking',k)] += ' S:%s' % r
-    election.update_record(counters=pack_counters(counters))
+            counters[key] += ' S:%s' % r
+
+    print counters
+    election.update_record(counters=counters)
 
 #@cache(request.env.path_info,time_expire=300,cache_model=cache.ram)
 def results():
@@ -265,8 +271,7 @@ def results():
     if (DEBUG_MODE or not election.counters or
         not election.deadline or request.now<=election.deadline):
         compute_results(election)
-    form = ballot2form(election.ballot_model,
-                       counters=unpack_counters(election.counters))
+    form = ballot2form(election.ballot_model, counters=election.counters)
     return dict(form=form,election=election)
 
 def hash_ballot(text):
@@ -314,7 +319,7 @@ def close_election():
     import zipfile, os
     election = db.election(request.args(0,cast=int)) or \
         redirect(URL('invalid_link'))
-    check_closed(election)
+    #check_closed(election)
     response.subtitle = election.title
     dialog = FORM.confirm(T('Close'),
                           {T('Cancel'):URL('elections')})
@@ -404,9 +409,10 @@ def vote():
             session.flash += T('Your vote was NOT recorded')
         redirect(URL('results',args=election.id))
     response.subtitle = election.title + ' / Vote'
-    form = ballot2form(election.ballot_model,readonly=False)
+    form = ballot2form(election.ballot_model, readonly=False)
+    form.process()
     if form.accepted:
-        results = {}
+        results = form.vars
         for_update = not db._uri.startswith('sqlite') # not suported by sqlite
         #if not for_update: db.executesql('begin immediate transaction;')
         ballot = db(db.ballot.election_id==election_id)\
@@ -417,7 +423,7 @@ def vote():
                                      token=ballot.ballot_uuid,
                                      vars=request.post_vars,results=results)
         signature = 'signature-'+sign(ballot_content,election.private_key)
-        ballot.update_record(results=str(results),
+        ballot.update_record(results=results,
                              ballot_content=ballot_content,
                              signature=signature,
                              voted=True,assigned=True,voted_on=request.now)

@@ -1,8 +1,3 @@
-{{
-response.files.append(URL('static','cleditor/jquery.cleditor.css'))
-response.files.append(URL('static','cleditor/jquery.cleditor.min.js'))
-response.files.append(URL('static','cleditor/jquery.cleditor.table.min.js'))
-}}
 {{extend 'layout.html'}}
 
 {{=form.custom.begin}}
@@ -24,9 +19,40 @@ response.files.append(URL('static','cleditor/jquery.cleditor.table.min.js'))
   <div class="fill">
     <div class="padded">
       <h5>{{=T('Ballot')}}</h5>
-      <p>{{=T('This is the text of the ballot. %s %s %s ..., add INPUT radio boxes. Radio boxes with the same number correspond to exclusive options.') % ('{'*2+'0'+'}'*2,
-        '{'*2+'1'+'}'*2,'{'*2+'2'+'}'*2)}}</p>
-      {{=form.custom.widget.ballot_model}}
+      <div id="target-ballot" style="background-color:#f1f1f1">
+        <div v-for="(question, q) in questions">
+          <div>
+            <textarea style="border: 2px solid #f1f1f1" 
+                      v-model="question.preamble"></textarea>
+          </div>
+          <div style="padding-left:50px">            
+            <label>Algorithm</label>
+            <select v-model="question.type" style="width:200px">
+              <option v-for="algorithm in algorithms"
+                      v-bind:value="algorithm" v-html="algorithm"></option>
+            </select>
+            Randomize? <input type="checkbox" v-model="question.randomize"/>
+            <table style="width:100%">
+              <tbody>
+                <tr v-for="(answer, a) in question.answers">
+                <td><input v-model="question.answers[a]"></td>
+                <td><button v-on:click.prevent="delete_answer(q, a)">delete</button></td>
+              </tr>
+              <tr>
+                <td><button v-on:click.prevent="append_answer(q)">new answer</button></td>
+                <td><button v-on:click.prevent="delete_question(q)">delete question</button></td>
+              </tr>
+              </tbody>
+            </table>            
+          </div>
+        </div>
+        <center>
+          <button v-on:click.prevent="append_question()">new question</button>
+        </center>
+      </div>
+      <div style="display:none">
+        {{=form.custom.widget.ballot_model}}
+      </div>
     </div>
   </div>
 </div>
@@ -85,9 +111,5 @@ response.files.append(URL('static','cleditor/jquery.cleditor.table.min.js'))
   </div>
 </div>
 
-<script type="text/javascript">
-jQuery(function() {
-  jQuery("#election_ballot_model").cleditor({width: '100%'})[0].focus();
-});
-</script>
-
+<script type="text/javascript" src="{{=URL('static','js/vue.min.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','js/custom.js')}}"></script>

@@ -13,7 +13,7 @@ db.define_table(
     Field('not_voted_email','text'),
     Field('public_key','text',writable=False,readable=False),                
     Field('private_key','text',writable=False,readable=False),                
-    Field('counters','text',writable=False,readable=False),                
+    Field('counters','json',writable=False,readable=False),                
     Field('closed','boolean',writable=False,readable=False),
     auth.signature,
     format='%(title)s')
@@ -33,7 +33,7 @@ db.define_table(
     Field('assigned','boolean',default=False),
     Field('voted','boolean',default=False),
     Field('voted_on','datetime',default=None),
-    Field('results','text',default='{}'),
+    Field('results','json',default={}),
     Field('ballot_uuid'), # uuid embedded in ballot
     Field('signature')) # signature of ballot (voted or blank)
 
