@@ -68,31 +68,3 @@ def message_replace(message,**vars):
     for key in vars:
         message = message.replace('{{=%s}}' % key, str(vars[key]))
     return message
-
-def meta_send(*args, **kwargs):
-    if kwargs.get('sender') == myconf.take('smtp.sender'):
-        mail.settings.server = myconf.take('smtp.server')
-        mail.settings.login = myconf.take('smtp.login')
-    return mail.send(*args, **kwargs)
-
-def meta_send2(to,message,reply_to,subject,sender=None):
-    import smtplib
-    fromaddr = mail.settings.sender
-    msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\nReply-to: %s\r\n\r\n%s" \
-        % (fromaddr, to, subject, reply_to, message)
-    try:
-        server = None
-        server = smtplib.SMTP(mail.settings.server,timeout=5)
-        server.ehlo(mail.settings.hostname)
-        server.starttls()
-        server.ehlo(mail.settings.hostname)
-        if mail.settings.login:
-            server.login(*mail.settings.login.split(':', 1))
-        server.sendmail(fromaddr, [to], msg)
-        return True
-    except:
-        return False
-    finally:
-        if server:
-            server.quit()
-

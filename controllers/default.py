@@ -1,6 +1,5 @@
 from ballot import ballot2form, form2ballot, blank_ballot, \
-    sign, uuid, regex_email, unpack_results, rsakeys, \
-    pack_counters, unpack_counters
+    sign, uuid, regex_email, rsakeys
 from ranking_algorithms import iro, borda, schulze
 import re
 
@@ -81,7 +80,7 @@ def start_callback():
             link_vote = URL('vote',args=(election.id,voter_uuid),scheme=SCHEME)
             link_ballots = URL('ballots',args=election.id,scheme=SCHEME)
             link_results = URL('results',args=election.id,scheme=SCHEME)
-            message = message_replace(election.vote_email,
+            body = message_replace(election.vote_email,
                                       election_id = election.id,
                                       owner_email = owner_email,
                                       title=election.title,
@@ -89,12 +88,11 @@ def start_callback():
                                       link_ballots=link_ballots,
                                       link_results=link_results)
             subject = '%s [%s]' % (election.title, election.id)
-            emails.append((voter,email,subject,message))
+            emails.append((voter,email,subject,body))
         db.commit()
         sender = election.email_sender or mail.settings.sender
-        for voter, to, subject, message in emails:
-            if meta_send2(to=to,subject=subject,message=message,
-                          sender=sender, reply_to=sender):
+        for voter, to, subject, body in emails:
+            if mail.send(to=to, subject=subject, message=body, sender=sender):
                 db(db.voter.id==voter).update(invited_on=request.now)
             else:
                 failures.append(to)
@@ -109,7 +107,7 @@ def self_service():
     form = SQLFORM.factory(
         Field('election_id','integer',requires=IS_NOT_EMPTY()),
         Field('email',requires=IS_EMAIL()))
-    if form.process.accepted():
+    if form.process().accepted:
         election = db.election(form.vars.id)
         if not election: form.errors['election_id'] = 'Invalid'
         voter = db.voter(election=election_id,email=form.vars.email)
@@ -120,7 +118,7 @@ def self_service():
             link_vote = URL('vote',args=(election.id,voter_uuid),scheme=SCHEME)
             link_ballots = URL('ballots',args=election.id,scheme=SCHEME)
             link_results = URL('results',args=election.id,scheme=SCHEME)
-            message = message_replace(election.vote_email,
+            body = message_replace(election.vote_email,
                                       election_id = election.id,
                                       owner_email = owner_email,
                                       title=election.title,
@@ -128,9 +126,7 @@ def self_service():
                                       link_ballots=link_ballots,
                                       link_results=link_results)
             sender = election.email_sender or mail.settings.sender
-            if meta_send2(to=voter.email,subject=election.title,
-                          message=message,
-                          sender=sender, reply_to=sender):
+            if mail.send(to=voter.email, subject=election.title, message=body, sender=sender):
                 response.flash = T('Email sent')
             else:
                 response.flash = T('Unable to send email')
@@ -161,7 +157,7 @@ def reminders_callback():
             link = URL('vote',args=(election.id,voter_uuid),scheme=SCHEME)
             link_ballots = URL('ballots',args=election.id,scheme=SCHEME)
             link_results = URL('results',args=election.id,scheme=SCHEME)
-            message = message_replace(election.vote_email,
+            body = message_replace(election.vote_email,
                                       election_id = election.id,
                                       owner_email = owner_email,
                                       title=election.title,
@@ -169,13 +165,13 @@ def reminders_callback():
                                       link_ballots=link_ballots,
                                       link_results=link_results)
             subject = '%s [%s]' % (election.title, election.id)
-            emails.append((email,subject,message))
+            emails.append((email,subject,body))
     form = SQLFORM.factory(*fields).process()
     if form.accepted:
         sender = election.email_sender or mail.settings.sender
-        for to, subject, message in emails:
-            if not meta_send2(to=to,subject=subject,message=message,
-                              sender=sender, reply_to=sender):
+        for to, subject, body in emails:
+            if not mail.send(to=to, subject=subject, message=body, sender=sender):
+                                 
                 failures.append(email)
         if not failures:
             session.flash = T('Emails sent successfully')
@@ -189,22 +185,25 @@ def recompute_results():
     redirect(URL('results',args=election.id))
 
 def compute_results(election):
-    voted_ballots = db(db.ballot.election_id==election.id
-                       )(db.ballot.voted==True).select()
+    query = db.ballot.election_id==election.id
+    voted_ballots = db(query)(db.ballot.voted==True).select()
     counters = {}
     rankers = {}
-    for k,ballot in enumerate(voted_ballots):
-        results = unpack_results(ballot.results)
-        for key in results:
+    for k,ballot in enumerate(voted_ballots):        
+        for name in ballot.results:
             # name is the name of a group as in {{name:ranking}}
             # scheme is "ranking" or "checkbox" (default)
             # value is the <input value="value"> assigned to this checkbox or input
-            (name,scheme,value) = key 
-            if scheme == 'checkbox':
+
+            # INPORTANT ONLY SUPPORT SIMPLE MAJORITY
+            key = name +'/simple-majority/' + ballot.results[name]
+            (name,scheme,value) = key.split('/',3)
+            if scheme == 'simple-majority':
                 # counters[key] counts how many times this checkbox was checked
-                counters[key] = counters.get(key,0) + (
-                    1 if results[key] else 0)                
+                counters[key] = counters.get(key,0) + 1
+                    
             elif scheme == 'ranking':
+                raise NotImplementedError
                 # rankers[name] = [[2,1,3],[3,1,2],[1,2,3],...]
                 #                 The sublists in rankers mean:
                 #                 [[my first-preferred candidate is
@@ -240,18 +239,22 @@ def compute_results(election):
                 vote[ranking-1] = value
             else:
                 raise RuntimeError("Invalid Voting Scheme")    
+
     for name in rankers:
         votes = rankers[name]
         cmajority = borda(votes,mode='exponential')
         ciro = iro(votes)
         cschulze = schulze(votes)
+        key = name+'/simple-majority/'+k
         for (r,k) in cmajority:
-            counters[(name,'ranking',k)] = 'M:%s' % r
+            counters[key] = 'M:%s' % r
         for (r,k) in ciro:
-            counters[(name,'ranking',k)] += ' I:%s' % r
+            counters[key] += ' I:%s' % r
         for (r,k) in cschulze:
-            counters[(name,'ranking',k)] += ' S:%s' % r
-    election.update_record(counters=pack_counters(counters))
+            counters[key] += ' S:%s' % r
+
+    print counters
+    election.update_record(counters=counters)
 
 #@cache(request.env.path_info,time_expire=300,cache_model=cache.ram)
 def results():
@@ -265,8 +268,7 @@ def results():
     if (DEBUG_MODE or not election.counters or
         not election.deadline or request.now<=election.deadline):
         compute_results(election)
-    form = ballot2form(election.ballot_model,
-                       counters=unpack_counters(election.counters))
+    form = ballot2form(election.ballot_model, counters=election.counters)
     return dict(form=form,election=election)
 
 def hash_ballot(text):
@@ -288,20 +290,21 @@ def ballots():
     return dict(ballots=ballots,election=election, tampered=tampered)
 
 # @auth.requires(auth.user and auth.user.is_manager)
-def email_voter_and_managers(election,voter,ballot,message):
+def email_voter_and_managers(election,voter,ballot,body):
     import cStringIO
     attachment = mail.Attachment(
         filename=ballot.ballot_uuid+'.html',
         payload=cStringIO.StringIO(ballot.ballot_content))
     sender = election.email_sender or mail.settings.sender
-    ret = meta_send(to=voter.email,
+    ret = mail.send(to=voter.email,
                     subject='Receipt for %s' % election.title,
-                    message=message,attachments=[attachment],
-                    sender=sender, reply_to=sender)
-    meta_send(to=regex_email.findall(election.managers),
+                    message=body,attachments=[attachment],
+                    sender=sender)
+    mail.send(to=regex_email.findall(election.managers),
               subject='Copy of Receipt for %s' % election.title,
-              message=message,attachments=[attachment],
-              sender=sender, reply_to=sender)
+              message=body,
+              attachments=[attachment],
+              sender=sender)
     return ret
 
 def check_closed(election):
@@ -314,7 +317,7 @@ def close_election():
     import zipfile, os
     election = db.election(request.args(0,cast=int)) or \
         redirect(URL('invalid_link'))
-    check_closed(election)
+    #check_closed(election)
     response.subtitle = election.title
     dialog = FORM.confirm(T('Close'),
                           {T('Cancel'):URL('elections')})
@@ -331,12 +334,12 @@ def close_election():
         for i in range(len(voters)):
             voter, ballot = voters[i], ballots[i]
             link = URL('ballot',args=ballot.ballot_uuid,scheme='http')
-            message = message_replace(election.not_voted_email,
+            body = message_replace(election.not_voted_email,
                                       election_id=election.id,
                                       owner_email = owner_email,
                                       title=election.title,
                                       signature=ballot.signature,link=link)
-            email_voter_and_managers(election,voter,ballot,message)
+            email_voter_and_managers(election,voter,ballot,body)
             ballot.update_record(assigned=True)
         compute_results(election)
         zippath = os.path.join(request.folder,'static','zips')
@@ -404,9 +407,10 @@ def vote():
             session.flash += T('Your vote was NOT recorded')
         redirect(URL('results',args=election.id))
     response.subtitle = election.title + ' / Vote'
-    form = ballot2form(election.ballot_model,readonly=False)
+    form = ballot2form(election.ballot_model, readonly=False)
+    form.process()
     if form.accepted:
-        results = {}
+        results = form.vars
         for_update = not db._uri.startswith('sqlite') # not suported by sqlite
         #if not for_update: db.executesql('begin immediate transaction;')
         ballot = db(db.ballot.election_id==election_id)\
@@ -417,7 +421,7 @@ def vote():
                                      token=ballot.ballot_uuid,
                                      vars=request.post_vars,results=results)
         signature = 'signature-'+sign(ballot_content,election.private_key)
-        ballot.update_record(results=str(results),
+        ballot.update_record(results=results,
                              ballot_content=ballot_content,
                              signature=signature,
                              voted=True,assigned=True,voted_on=request.now)
@@ -425,11 +429,11 @@ def vote():
         link = URL('ballot',args=(ballot.ballot_uuid,ballot.signature),
                    scheme='http')
 
-        message = message_replace(election.voted_email,link=link,
+        body = message_replace(election.voted_email,link=link,
                                   election_id=election.id,
                                   owner_email = election.created_by.email,
                                   title=election.title,signature=signature)
-        emailed = email_voter_and_managers(election,voter,ballot,message)
+        emailed = email_voter_and_managers(election,voter,ballot,body)
         session.flash = \
             T('Your vote was recorded and we sent you an email') \
             if emailed else \

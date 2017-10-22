@@ -1,11 +1,18 @@
-not_empty = IS_NOT_EMPTY()
+NE = IS_NOT_EMPTY()
+
+maybe_can_choose = AS_SERVICE or DEVELOPMENT
+
+auth.settings.extra_fields['auth_user'] = [
+    Field('is_manager','boolean',default=False, writable=maybe_can_choose, readable=maybe_can_choose)]
+          
+auth.define_tables(username=False, signature=False)
 
 db.define_table(
     'election',
-    Field('title',requires=not_empty),
-    Field('ballot_model','text',requires=not_empty), # empty ballot
-    Field('voters','text',requires=not_empty),
-    Field('managers','text',requires=not_empty),
+    Field('title',requires=NE),
+    Field('ballot_model','text',requires=NE), # empty ballot
+    Field('voters','text',requires=NE),
+    Field('managers','text',requires=NE),
     Field('deadline','datetime'),
     Field('vote_email','text'),
     Field('voted_email','text'),
@@ -13,7 +20,7 @@ db.define_table(
     Field('not_voted_email','text'),
     Field('public_key','text',writable=False,readable=False),                
     Field('private_key','text',writable=False,readable=False),                
-    Field('counters','text',writable=False,readable=False),                
+    Field('counters','json',writable=False,readable=False),                
     Field('closed','boolean',writable=False,readable=False),
     auth.signature,
     format='%(title)s')
@@ -33,8 +40,6 @@ db.define_table(
     Field('assigned','boolean',default=False),
     Field('voted','boolean',default=False),
     Field('voted_on','datetime',default=None),
-    Field('results','text',default='{}'),
+    Field('results','json',default={}),
     Field('ballot_uuid'), # uuid embedded in ballot
     Field('signature')) # signature of ballot (voted or blank)
-
-

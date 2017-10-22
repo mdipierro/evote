@@ -1,6 +1,8 @@
 from gluon import *
 import re, hashlib, base64
 import rsa
+import json
+import random
 import cPickle as pickle
 from uuid import uuid4
 try:
@@ -25,70 +27,48 @@ def sign(text,privkey_pem):
     signature = base64.b16encode(rsa.sign(text,privkey,'SHA-1'))
     return signature
 
-def unpack_results(results):
-    return ast.literal_eval(results) if have_ast else eval(results)
-
-def ballot2form(ballot,readonly=False,counters=None,filled=False):
+def ballot2form(ballot_model,readonly=False, vars=None, counters=None):
     """If counters is passed this counts the results in the ballot.
     If readonly is False, then the voter has not yet voted; if readonly
     is True, then they have just voted."""    
-    radioes = {}    
-    if isinstance(counters,dict): readonly=True
-    def radio(item):     
-        name = "ck_"+item.group(1)       
-        value = radioes[name] = radioes.get(name,0)+1        
-        if item.group(2):
-            scheme = 'ranking'
+    ballot_structure = json.loads(ballot_model)
+    ballot = FORM()
+    for question in ballot_structure:
+        div =DIV(_class="question")
+        ballot.append(div)
+        div.append(MARKMIN(question['preamble']))
+        table = TABLE()
+        div.append(table)        
+        name = question['name']
+        if counters:
+            options = []
+            for answer in question['answers']:
+                key = name+'/simple-majority/'+answer
+                options.append((counters.get(key,0), answer))
+            options.sort(reverse=True)
+            options = map(lambda a: a[1], options)
         else:
-            scheme = 'checkbox'
-        key = (name,scheme,value)
-        if isinstance(counters,dict):
-            return INPUT(_type='text',_readonly=True,
-                         _value=counters.get(key,0),
-                         _class='model-'+scheme,
-                         _style="width:3em").xml()
-        ### CHECK THIS!
-        #if counters is not None and 'x' in item.group().lower():
-        #    counters[key] = counters.get(key,0)+1
-        ### CHECK THIS!
-        if scheme == 'checkbox':
-            return INPUT(_type='radio',_name=name,_value=value,
-                         _checked=('!' in item.group()),
-                         _class='model-'+scheme,
-                         _disabled=readonly).xml()
-        elif scheme == 'ranking':
-            name = name+'-%s-%s' % (item.group(2)[1:], value)
-            return INPUT(_type='input',_name=name,_value=value,
-                         _checked=('!' in item.group()),
-                         _class='model-'+scheme,
-                         _disabled=readonly,
-                         ).xml()   
-    body = regex_field.sub(radio,ballot.replace('\r',''))
-    form = FORM(XML(body),not readonly and INPUT(_type='submit', _value="Submit Your Ballot!") or '',_class="ballot")
-    if not readonly: form.process(formname="ballot")
-    return form
+            options = question['answers']
+            if question['randomize']:
+                random.shuffle(options)
+        for answer in options:
+            key = name + '/simple-majority/' + answer
+            if not counters:
+                if question['algorithm'] == 'simple-majority':
+                    inp = INPUT(_name=question['name'], _type="radio", _value=answer)
+                if vars and vars.get(name) == answer:
+                    inp['_checked'] = True
+                if readonly:
+                    inp['_readonly'] = True
+            else:
+                inp = STRONG(counters.get(key, 0))
+            table.append(TR(TD(inp),TD(answer)))
+    if not readonly and not counters: 
+        ballot.append(INPUT(_type='submit', _value="Submit Your Ballot!"))
+    return ballot
 
-def form2ballot(ballot,token,vars,results):    
-    radioes = {}
-    def check(item):        
-        name = 'ck_'+item.group(1)
-        value = radioes[name] = radioes.get(name,0)+1
-        if item.group(2):
-            scheme = item.group(2)[1:]
-            name2 = name+'-%s-%s' % (scheme, value)
-            rank = vars.get(name2,0)            
-            if isinstance(results,dict):
-                results[(name,scheme,value)] = int(rank)
-            return INPUT(_type="input",_name=name2,_value=rank,
-                         _disabled=True).xml()
-        else:
-            scheme = 'checkbox'
-            checked = vars.get(name,0)==str(value)
-            if isinstance(results,dict):
-                results[(name,scheme,value)] = checked
-            return INPUT(_type="radio",_name=name,_value=value,
-                         _disabled=True,_checked=checked).xml()
-    ballot_content = regex_field.sub(check,ballot.replace('\r',''))
+def form2ballot(ballot_model, token, vars, results):    
+    ballot_content = ballot2form(ballot_model, readonly=True, vars=vars).xml()
     if token: ballot_content += '<pre>\n%s\n</pre>' % token
     return '<div class="ballot">%s</div>' % ballot_content.strip()
 
@@ -97,8 +77,3 @@ def blank_ballot(token):
     if token: ballot_content += '<pre>\n%s\n</pre>' % token
     return '<div class="ballot">%s</div>' % ballot_content
 
-def pack_counters(counters):
-    return pickle.dumps(counters)
-
-def unpack_counters(counters):
-    return pickle.loads(counters)
