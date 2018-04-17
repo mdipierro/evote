@@ -1,5 +1,4 @@
-from ballot import ballot2form, form2ballot, blank_ballot, \
-    sign, uuid, regex_email, rsakeys
+from ballot import ballot2form, form2ballot, blank_ballot, sign, uuid, regex_email, rsakeys
 from ranking_algorithms import iro, borda, schulze
 import re
 
@@ -426,8 +425,7 @@ def vote():
                              signature=signature,
                              voted=True,assigned=True,voted_on=request.now)
         voter.update_record(voted=True)
-        link = URL('ballot',args=(ballot.ballot_uuid,ballot.signature),
-                   scheme='http')
+        link = URL('ballot',args=(ballot.ballot_uuid,ballot.signature), scheme='http')
 
         body = message_replace(election.voted_email,link=link,
                                   election_id=election.id,

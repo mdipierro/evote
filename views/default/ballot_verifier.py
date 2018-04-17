@@ -26,7 +26,7 @@ pk_pem = """
 
 # this is the code that verifies the signature
 public_key = rsa.PublicKey.load_pkcs1(pk_pem)
-if rsa.verify(ballot, signature, public_key)==None:
+if rsa.verify(ballot, signature, public_key):
     print 'valid'
 else:
     print 'invalid'

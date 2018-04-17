@@ -27,7 +27,7 @@ def sign(text,privkey_pem):
     signature = base64.b16encode(rsa.sign(text,privkey,'SHA-1'))
     return signature
 
-def ballot2form(ballot_model,readonly=False, vars=None, counters=None):
+def ballot2form(ballot_model, readonly=False, vars=None, counters=None):
     """If counters is passed this counts the results in the ballot.
     If readonly is False, then the voter has not yet voted; if readonly
     is True, then they have just voted."""    
@@ -36,7 +36,8 @@ def ballot2form(ballot_model,readonly=False, vars=None, counters=None):
     for question in ballot_structure:
         div =DIV(_class="question")
         ballot.append(div)
-        div.append(MARKMIN(question['preamble']))
+        html = MARKMIN(question['preamble'])
+        div.append(html)
         table = TABLE()
         div.append(table)        
         name = question['name']
@@ -59,10 +60,14 @@ def ballot2form(ballot_model,readonly=False, vars=None, counters=None):
                 if vars and vars.get(name) == answer:
                     inp['_checked'] = True
                 if readonly:
-                    inp['_readonly'] = True
+                    inp['_disabled'] = True
             else:
                 inp = STRONG(counters.get(key, 0))
             table.append(TR(TD(inp),TD(answer)))
+        if question['comments']:        
+            value = readonly and vars.get(question['name']+'_comments') or ''
+            textarea =  TEXTAREA(value, _disabled=readonly, _name=question['name']+'_comments')
+            ballot.append(DIV(H4('Comments'), textarea))
     if not readonly and not counters: 
         ballot.append(INPUT(_type='submit', _value="Submit Your Ballot!"))
     return ballot

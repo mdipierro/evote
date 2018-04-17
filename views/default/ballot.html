@@ -6,9 +6,7 @@
 
       {{=XML(ballot.ballot_content)}}
       
-      <pre>
-        {{=ballot.signature}}
-      </pre>
+      <pre style="overflow-x:scroll">{{=ballot.signature}}</pre>
       
       <p>{{=T('The signature is an RSA digital signature generated from the ballot content and the election private_key')}}</p>
       

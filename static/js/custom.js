@@ -8,7 +8,8 @@ function get_random() {
     return uu8;
 };
 
-let NEW_QUESTION = {'preamble':'', 'answers':['','',''], 'algorithm':'simple-majority', 'randomize':true, 'name': null};
+let NEW_QUESTION = {'preamble':'', 'answers':['','',''], 'algorithm':'simple-majority', 
+                    'randomize':true, 'comments':false, 'name': null};
                     
 let ALGORITHMS = ['simple-majority'] // ,'instant-runoff','borda','schulze'];
 let app = {}; 

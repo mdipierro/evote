@@ -8,7 +8,7 @@ myconf = AppConfig(reload=True)
 DEVELOPMENT = myconf.take('app.development').lower()=='true'
 AS_SERVICE = myconf.take('app.as_service').lower()=='true'
 DEBUG_MODE = myconf.take('app.debug_mode').lower()=='true'
-SCHEME = True if DEVELOPMENT else 'https'
+SCHEME = 'http' # if DEVELOPMENT else 'https'
 
 db = DAL(myconf.take('db.uri'), pool_size=myconf.take('db.pool_size', cast=int), check_reserved=['all'])
 

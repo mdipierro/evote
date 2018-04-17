@@ -32,6 +32,7 @@
                       v-bind:value="algorithm" v-html="algorithm"></option>
             </select>
             Randomize? <input type="checkbox" v-model="question.randomize"/>
+            Comments? <input type="checkbox" v-model="question.comments"/>
             <table style="width:100%">
               <tbody>
                 <tr v-for="(answer, a) in question.answers">
