@@ -22,6 +22,7 @@ E-Vote uses the [web2py](http://web2py.com/) framework and can be installed like
       $ git clone https://github.com/mdipierro/evote.git
       $ cd ..
       $ sudo /etc/init.d/apachectl stop  # <-- stop other web server if needed
+      $ pip install rsa
       $ python web2py.py
         ...Watch it launch, then visit
            http://127.0.0.1:8000/evote/default/index
