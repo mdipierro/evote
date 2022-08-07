@@ -1,4 +1,0 @@
-{{if auth.user.is_manager:}}
-<h2>Create a new election</h2>
-{{=A(T('New Election'),_href=URL('edit'),_class="btn")}}
-{{pass}}
