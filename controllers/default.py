@@ -26,14 +26,14 @@ def edit():
         db.election.voters.default = auth.user.email
         db.election.managers.default = auth.user.email
         db.election.public_key.default = pubkey
-        db.election.private_key.default = privkey        
+        db.election.private_key.default = privkey
     form = SQLFORM(db.election,election,deletable=True,
                    submit_button="Save and Preview").process()
     if form.accepted: redirect(URL('start',args=form.vars.id))
     return dict(form=form)
 
 @auth.requires(auth.user and auth.user.is_manager)
-def start():    
+def start():
     election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
     check_closed(election)
     response.subtitle = election.title+T(' / Start')
@@ -130,10 +130,10 @@ def self_service():
             else:
                 response.flash = T('Unable to send email')
     return dict(form=form)
-                                
+
 
 @auth.requires(auth.user and auth.user.is_manager)
-def reminders():    
+def reminders():
     election = db.election(request.args(0,cast=int)) or redirect(URL('index'))
     response.subtitle = election.title+T(' / Reminders')
     return dict(election=election)
@@ -152,7 +152,7 @@ def reminders_callback():
         key = 'voter_%s' % voter.id
         fields.append(Field(key,'boolean',default=not voter.voted,
                             label = voter.email))
-        if key in request.post_vars:            
+        if key in request.post_vars:
             link = URL('vote',args=(election.id,voter_uuid),scheme=SCHEME)
             link_ballots = URL('ballots',args=election.id,scheme=SCHEME)
             link_results = URL('results',args=election.id,scheme=SCHEME)
@@ -170,7 +170,7 @@ def reminders_callback():
         sender = election.email_sender or mail.settings.sender
         for to, subject, body in emails:
             if not mail.send(to=to, subject=subject, message=body, sender=sender):
-                                 
+
                 failures.append(email)
         if not failures:
             session.flash = T('Emails sent successfully')
@@ -188,7 +188,7 @@ def compute_results(election):
     voted_ballots = db(query)(db.ballot.voted==True).select()
     counters = {}
     rankers = {}
-    for k,ballot in enumerate(voted_ballots):        
+    for k,ballot in enumerate(voted_ballots):
         for name in ballot.results:
             # name is the name of a group as in {{name:ranking}}
             # scheme is "ranking" or "checkbox" (default)
@@ -200,7 +200,7 @@ def compute_results(election):
             if scheme == 'simple-majority':
                 # counters[key] counts how many times this checkbox was checked
                 counters[key] = counters.get(key,0) + 1
-                    
+
             elif scheme == 'ranking':
                 raise NotImplementedError
                 # rankers[name] = [[2,1,3],[3,1,2],[1,2,3],...]
@@ -228,16 +228,16 @@ def compute_results(election):
                 if len(rankers[name])<k+1:
                     rankers[name].append([])
                 vote = rankers[name][-1]
-                print "ballot id:",ballot.id, "key:",key, "results[key]:",results[key], "vote:",vote
+                print("ballot id:",ballot.id, "key:",key, "results[key]:",results[key], "vote:",vote)
                 ranking = int(results[key])
                 d = ranking-len(vote)
                 if d>0:
-                    print "vote before:", vote
+                    print("vote before:", vote)
                     vote+=[0]*d
-                    print "vote after: ", vote
+                    print("vote after: ", vote)
                 vote[ranking-1] = value
             else:
-                raise RuntimeError("Invalid Voting Scheme")    
+                raise RuntimeError("Invalid Voting Scheme")
 
     for name in rankers:
         votes = rankers[name]
@@ -252,7 +252,7 @@ def compute_results(election):
         for (r,k) in cschulze:
             counters[key] += ' S:%s' % r
 
-    print counters
+    print(counters)
     election.update_record(counters=counters)
 
 #@cache(request.env.path_info,time_expire=300,cache_model=cache.ram)
@@ -274,26 +274,26 @@ def hash_ballot(text):
     import re
     text = text.replace('checked="checked" ','')
     text = text.replace('disabled="disabled" ','')
-    text = re.sub('value="\d+"','',text)
-    text = re.sub('ballot\S+','',text)
+    text = re.sub(r'value="\d+"','',text)
+    text = re.sub(r'ballot\S+','',text)
     return hash(text)
 
 def ballots():
     election = db.election(request.args(0,cast=int)) or \
         redirect(URL('invalid_link'))
     response.subtitle = election.title + T(' / Ballots')
-    ballots = db(db.ballot.election_id==election.id).select(        
+    ballots = db(db.ballot.election_id==election.id).select(
         orderby=db.ballot.ballot_uuid)
-    tampered = len(set(hash_ballot(b.ballot_content) 
+    tampered = len(set(hash_ballot(b.ballot_content)
                        for b in ballots if b.voted))>1
     return dict(ballots=ballots,election=election, tampered=tampered)
 
 # @auth.requires(auth.user and auth.user.is_manager)
 def email_voter_and_managers(election,voter,ballot,body):
-    import cStringIO
+    from io import StringIO
     attachment = mail.Attachment(
         filename=ballot.ballot_uuid+'.html',
-        payload=cStringIO.StringIO(ballot.ballot_content))
+        payload=StringIO(ballot.ballot_content))
     sender = election.email_sender or mail.settings.sender
     ret = mail.send(to=voter.email,
                     subject='Receipt for %s' % election.title,
@@ -386,18 +386,18 @@ def ballot_verifier():
     response.headers['Content-Type'] = 'text/plain'
     return ballot()
 
-def vote():    
+def vote():
     import hashlib
     response.menu = []
     election_id = request.args(0,cast=int)
     voter_uuid = request.args(1)
-    election = db.election(election_id) or redirect(URL('invalid_link'))       
+    election = db.election(election_id) or redirect(URL('invalid_link'))
     voter = db(db.voter.election_id==election_id)\
         (db.voter.voter_uuid==voter_uuid).select().first() or \
         redirect(URL('invalid_link'))
     if not DEBUG_MODE and voter.voted:
         redirect(URL('voted_already'))
-    
+
     if election.deadline and request.now>election.deadline:
         session.flash = T('Election is closed')
         if voter.voted:

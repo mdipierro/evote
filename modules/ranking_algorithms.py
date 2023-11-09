@@ -20,7 +20,7 @@ def iro(votes):
     # winners is a list of (v,k) = (number of preferences, option number)
     # ordered from the candidate with the least preferences to the highest
     winners = []
-    losers = set()    
+    losers = set()
     allowed_options = reduce(lambda a,b:a|b,[set(vote) for vote in votes])
     n = len(allowed_options)
     while len(winners)<n:
@@ -35,7 +35,7 @@ def iro(votes):
             if not item in losers:
                 options[item] = 0
         # for every ballot
-        for vote in votes: 
+        for vote in votes:
             # if the vote for the ballot is valid
             if is_valid(vote):
                 # for each voting option in this balloe
@@ -43,13 +43,13 @@ def iro(votes):
                     # if the option(candidate) have not been
                     # alreday discurded
                     if not item in losers:
-                        # count how many ballot have this option 
+                        # count how many ballot have this option
                         # as first option
                         options[item] += 1
                         break
-                    
+
         # find the option(candidate) with the least number of
-        # top preferences                    
+        # top preferences
         options_list = [(v,k) for (k,v) in options.items()]
         options_list.sort()
         minv = options_list[0][0]
@@ -112,15 +112,15 @@ def schulze(votes):
     winners = range(n)
     winners.sort(lambda i,j: cmp(p[i,j],p[j,i]))
     return [(i,candidates[k]) for (i,k) in enumerate(winners)]
-    
-    
+
+
 
 def test(nsamples=10):
     diff_iro_borda = 0
     diff_iro_schulze = 0
     diff_borda_schulze = 0
     for k in range(nsamples):
-        votes = makeup_votes(10)            
+        votes = makeup_votes(10)
         a = iro(votes)
         b = borda(votes,mode="exponential")
         c = schulze(votes)
@@ -131,7 +131,7 @@ def test(nsamples=10):
         if b[-1][1]!=c[-1][1]:
             diff_borda_schulze+=1
 
-    print diff_iro_borda, diff_iro_schulze, diff_borda_schulze
+    print(diff_iro_borda, diff_iro_schulze, diff_borda_schulze)
 
 def test_schulze():
     votes = []
@@ -149,6 +149,6 @@ if __name__ == '__main__':
     test()
     test_schulze()
     votes = makeup_votes(10)
-    print borda(votes,mode="exponential")
-    print iro(votes)
-    print schulze(votes)
+    print(borda(votes,mode="exponential"))
+    print(iro(votes))
+    print(schulze(votes))

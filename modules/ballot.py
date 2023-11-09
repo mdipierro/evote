@@ -3,7 +3,7 @@ import re, hashlib, base64
 import rsa
 import json
 import random
-import cPickle as pickle
+import pickle
 from uuid import uuid4
 try:
     import ast
@@ -11,8 +11,8 @@ try:
 except:
     have_ast=False
 
-regex_field = re.compile('{{(\w+)(\:\w+)?\!?}}')
-regex_email = re.compile('[^\s<>"\',;]+\@[^\s<>"\',;]+',re.IGNORECASE)
+regex_field = re.compile(r'{{(\w+)(\:\w+)?\!?}}')
+regex_email = re.compile(r'[^\s<>"\',;]+\@[^\s<>"\',;]+',re.IGNORECASE)
 
 
 def uuid():
@@ -24,13 +24,14 @@ def rsakeys():
 
 def sign(text,privkey_pem):
     privkey = rsa.PrivateKey.load_pkcs1(privkey_pem)
-    signature = base64.b16encode(rsa.sign(text,privkey,'SHA-1'))
+    signature = base64.b16encode(rsa.sign(bytes(text, 'utf-8'), privkey,'SHA-1'))
+    signature = signature.decode()
     return signature
 
 def ballot2form(ballot_model, readonly=False, vars=None, counters=None):
     """If counters is passed this counts the results in the ballot.
     If readonly is False, then the voter has not yet voted; if readonly
-    is True, then they have just voted."""    
+    is True, then they have just voted."""
     ballot_structure = json.loads(ballot_model)
     ballot = FORM()
     for question in ballot_structure:
@@ -39,7 +40,7 @@ def ballot2form(ballot_model, readonly=False, vars=None, counters=None):
         html = MARKMIN(question['preamble'])
         div.append(html)
         table = TABLE()
-        div.append(table)        
+        div.append(table)
         name = question['name']
         if counters:
             options = []
@@ -64,16 +65,17 @@ def ballot2form(ballot_model, readonly=False, vars=None, counters=None):
             else:
                 inp = STRONG(counters.get(key, 0))
             table.append(TR(TD(inp),TD(answer)))
-        if question['comments']:        
+        if question['comments']:
             value = readonly and vars.get(question['name']+'_comments') or ''
             textarea =  TEXTAREA(value, _disabled=readonly, _name=question['name']+'_comments')
             ballot.append(DIV(H4('Comments'), textarea))
-    if not readonly and not counters: 
+    if not readonly and not counters:
         ballot.append(INPUT(_type='submit', _value="Submit Your Ballot!"))
     return ballot
 
-def form2ballot(ballot_model, token, vars, results):    
+def form2ballot(ballot_model, token, vars, results):
     ballot_content = ballot2form(ballot_model, readonly=True, vars=vars).xml()
+    ballot_content = ballot_content.decode()
     if token: ballot_content += '<pre>\n%s\n</pre>' % token
     return '<div class="ballot">%s</div>' % ballot_content.strip()
 
@@ -81,4 +83,3 @@ def blank_ballot(token):
     ballot_content = '<h2>Blank</h2>'
     if token: ballot_content += '<pre>\n%s\n</pre>' % token
     return '<div class="ballot">%s</div>' % ballot_content
-
