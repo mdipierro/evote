@@ -24,7 +24,8 @@ def rsakeys():
 
 def sign(text,privkey_pem):
     privkey = rsa.PrivateKey.load_pkcs1(privkey_pem)
-    signature = base64.b16encode(rsa.sign(text,privkey,'SHA-1'))
+    signature = base64.b16encode(rsa.sign(bytes(text, 'utf-8'), privkey,'SHA-1'))
+    signature = signature.decode()
     return signature
 
 def ballot2form(ballot_model, readonly=False, vars=None, counters=None):
@@ -74,6 +75,7 @@ def ballot2form(ballot_model, readonly=False, vars=None, counters=None):
 
 def form2ballot(ballot_model, token, vars, results):
     ballot_content = ballot2form(ballot_model, readonly=True, vars=vars).xml()
+    ballot_content = ballot_content.decode()
     if token: ballot_content += '<pre>\n%s\n</pre>' % token
     return '<div class="ballot">%s</div>' % ballot_content.strip()
 
@@ -81,4 +83,3 @@ def blank_ballot(token):
     ballot_content = '<h2>Blank</h2>'
     if token: ballot_content += '<pre>\n%s\n</pre>' % token
     return '<div class="ballot">%s</div>' % ballot_content
-

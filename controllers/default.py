@@ -290,10 +290,10 @@ def ballots():
 
 # @auth.requires(auth.user and auth.user.is_manager)
 def email_voter_and_managers(election,voter,ballot,body):
-    import cStringIO
+    from io import StringIO
     attachment = mail.Attachment(
         filename=ballot.ballot_uuid+'.html',
-        payload=cStringIO.StringIO(ballot.ballot_content))
+        payload=StringIO(ballot.ballot_content))
     sender = election.email_sender or mail.settings.sender
     ret = mail.send(to=voter.email,
                     subject='Receipt for %s' % election.title,
